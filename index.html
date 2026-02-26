@@ -217,6 +217,14 @@ textarea{resize:none}
 .ropt-n{background:var(--sf2);border:1px solid var(--bd);opacity:.4}
 .ropt-num{font-family:var(--mn);font-size:11px;flex-shrink:0;margin-top:1px;min-width:16px}
 .rv-memo{margin-top:10px;padding:9px 12px;border-radius:var(--r8);background:var(--sf2);border-left:2px solid var(--bd2);font-size:13px;color:var(--mu);line-height:1.6}
+.rtag-c{background:rgba(0,212,170,.1);color:var(--tl);border:1px solid rgba(0,212,170,.25)}
+.rv-section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:8px 0;border-bottom:1px solid var(--bd)}
+.rv-section-title{font-size:13px;font-weight:700;color:var(--mu)}
+.rv-section-cnt{font-family:var(--mn);font-size:12px;color:var(--mu);background:var(--sf2);padding:2px 8px;border-radius:20px;border:1px solid var(--bd)}
+.rv-card-fold .rv-fold-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;gap:8px}
+.rv-fold-arrow{font-size:20px;color:var(--dm);transition:transform .2s;flex-shrink:0;line-height:1;user-select:none}
+.rv-card-fold.open .rv-fold-arrow{transform:rotate(90deg);color:var(--mu)}
+.rv-fold-body{padding-top:14px}
 
 /* ══ HISTORY ════════════════════════════════════════ */
 .hist-item{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r16);padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s;margin-bottom:8px}
@@ -861,27 +869,117 @@ function resultScreen(){
 function reviewScreen(){
   const src=reviewSrc||result;
   if(!src) return `${topbar('review')}<div class="page"><div class="wrap"><div class="empty"><span class="empty-icon">🔍</span>리뷰 데이터가 없습니다</div></div></div>`;
-  const items=[
-    ...(src.wrongItems||[]).map(x=>({...x,type:'wrong'})),
-    ...(src.flagItems||[]).filter(x=>!(src.wrongItems||[]).some(w=>w.i===x.i)).map(x=>({...x,type:'flag'})),
-  ];
-  if(!items.length) return `${topbar('review')}<div class="page"><div class="wrap"><div class="empty"><span class="empty-icon">🎯</span>모두 정답이에요!</div></div></div>`;
+
+  const wrongSet=new Set((src.wrongItems||[]).map(x=>x.i));
+  const flagSet =new Set((src.flagItems ||[]).map(x=>x.i));
+
+  // 전체 문항 (questions가 있으면 직접, 없으면 DATA에서 복원)
+  const allQuestions = src.questions ||
+    (src.subject==='전과목' ? DATA : DATA.filter(q=>q.subject===src.subject));
+
+  // answers 맵 구성 (wrongItems + flagItems에서 sel 추출)
+  const selMap={};
+  [...(src.wrongItems||[]),...(src.flagItems||[])].forEach(x=>{ selMap[x.i]=x.sel; });
+
   const localMemos=getLocalMemos();
-  const cards=items.map(({q,i,sel,type,memo})=>{
-    const m=(src.memos||{})[i]||localMemos[qKey(q)]||memo||'';
-    const tag=type==='wrong'?`<span class="rtag rtag-w">오답</span>`:`<span class="rtag rtag-f">🚩 플래그</span>`;
-    const info=sel?`<span class="c-mu fs13">내 답: <b style="color:var(--rs)">${sel}번</b> → 정답: <b style="color:var(--tl)">${q.correct_answer}번</b></span>`:`<span class="c-mu fs13">미응답 → 정답: <b style="color:var(--tl)">${q.correct_answer}번</b></span>`;
+
+  function makeCard({q, i, sel}, type){
+    const m=(src.memos||{})[i]||localMemos[qKey(q)]||'';
+    const isCorrect = type==='correct';
+    const cardId = `rv-card-${i}`;
+
+    let tags='';
+    if(wrongSet.has(i))  tags+=`<span class="rtag rtag-w">오답</span>`;
+    if(flagSet.has(i))   tags+=`<span class="rtag rtag-f">🚩 플래그</span>`;
+    if(isCorrect)        tags+=`<span class="rtag rtag-c">✓ 정답</span>`;
+
+    const info = isCorrect
+      ? `<span class="c-mu fs13">정답: <b style="color:var(--tl)">${q.correct_answer}번</b></span>`
+      : sel
+        ? `<span class="c-mu fs13">내 답: <b style="color:var(--rs)">${sel}번</b> → 정답: <b style="color:var(--tl)">${q.correct_answer}번</b></span>`
+        : `<span class="c-mu fs13">미응답 → 정답: <b style="color:var(--tl)">${q.correct_answer}번</b></span>`;
+
     const opts=q.options.map((txt,oi)=>{
-      const n=oi+1; let cls='ropt'; if(n===q.correct_answer)cls+=' ropt-c'; else if(sel===n)cls+=' ropt-w'; else cls+=' ropt-n';
+      const n=oi+1;
+      let cls='ropt';
+      if(n===q.correct_answer) cls+=' ropt-c';
+      else if(!isCorrect&&sel===n) cls+=' ropt-w';
+      else cls+=' ropt-n';
       return `<div class="${cls}"><span class="ropt-num">${n}</span>${esc(txt)}</div>`;
     }).join('');
-    return `<div class="rv-card"><div class="rv-tags">${tag}<span class="badge ${subBadge(q.subject)}">${esc(q.subject)}</span><span class="mono fs13 c-mu">문항 ${q.number}</span>${info}</div><div class="rv-q">${esc(q.content)}</div><div class="rv-opts">${opts}</div>${m?`<div class="rv-memo">📝 ${esc(m)}</div>`:''}</div>`;
-  }).join('');
+
+    const body=`
+      <div class="rv-card-body">
+        <div class="rv-q">${esc(q.content)}</div>
+        <div class="rv-opts">${opts}</div>
+        ${m?`<div class="rv-memo">📝 ${esc(m)}</div>`:''}
+      </div>`;
+
+    if(isCorrect){
+      // 폴딩 카드
+      return `
+      <div class="rv-card rv-card-fold" id="${cardId}">
+        <div class="rv-fold-header" onclick="toggleRvCard('${cardId}')">
+          <div class="rv-tags">${tags}<span class="badge ${subBadge(q.subject)}">${esc(q.subject)}</span><span class="mono fs13 c-mu">문항 ${q.number}</span>${info}</div>
+          <span class="rv-fold-arrow">›</span>
+        </div>
+        <div class="rv-fold-body" style="display:none">${body}</div>
+      </div>`;
+    } else {
+      // 펼쳐진 카드
+      return `
+      <div class="rv-card">
+        <div class="rv-tags">${tags}<span class="badge ${subBadge(q.subject)}">${esc(q.subject)}</span><span class="mono fs13 c-mu">문항 ${q.number}</span>${info}</div>
+        ${body}
+      </div>`;
+    }
+  }
+
+  // 오답·플래그 카드 (항상 펼침)
+  const badItems=[
+    ...(src.wrongItems||[]).map(x=>({...x, type:'wrong'})),
+    ...(src.flagItems||[]).filter(x=>!wrongSet.has(x.i)).map(x=>({...x, type:'flag'})),
+  ];
+  const badCards = badItems.map(item=>makeCard(item, item.type)).join('');
+
+  // 정답 카드 (폴딩)
+  const correctItems = allQuestions
+    .map((q, i) => ({ q, i, sel: selMap[i] ?? null }))
+    .filter(({i}) => !wrongSet.has(i) && !flagSet.has(i));
+  const correctCards = correctItems.map(item=>makeCard(item,'correct')).join('');
+
+  const totalBad=badItems.length;
+  const totalCorrect=correctItems.length;
+
   return `
   ${topbar('review')}
   <div class="page"><div class="wrap">
-    <div class="pg-head"><div><div class="pg-title">오답·플래그 리뷰</div><div class="pg-sub">${items.length}문제</div></div><div class="sp"></div><button class="btn btn-outline btn-sm" data-screen="home">홈으로</button></div>
-    ${cards}
+    <div class="pg-head">
+      <div>
+        <div class="pg-title">전체 리뷰</div>
+        <div class="pg-sub">오답·플래그 ${totalBad}문제 · 정답 ${totalCorrect}문제</div>
+      </div>
+      <div class="sp"></div>
+      <button class="btn btn-outline btn-sm" data-screen="home">홈으로</button>
+    </div>
+
+    ${totalBad ? `
+    <div class="rv-section-head">
+      <span class="rv-section-title">❌ 오답 · 🚩 플래그</span>
+      <span class="rv-section-cnt">${totalBad}문제</span>
+    </div>
+    ${badCards}` : `<div class="empty" style="padding:28px 0"><span class="empty-icon" style="font-size:28px">🎯</span>오답·플래그 없음</div>`}
+
+    ${totalCorrect ? `
+    <div class="rv-section-head" style="margin-top:20px">
+      <span class="rv-section-title">✅ 정답 맞힌 문제</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="rv-section-cnt">${totalCorrect}문제</span>
+        <button class="btn btn-outline btn-sm" onclick="toggleAllCorrect()">전체 펼치기</button>
+      </div>
+    </div>
+    <div id="correct-cards">${correctCards}</div>` : ''}
+
   </div></div>`;
 }
 
@@ -953,6 +1051,30 @@ function settingsScreen(){
 }
 
 /* ══════════════════════════════════════════════════════════════
+   REVIEW HELPERS
+══════════════════════════════════════════════════════════════ */
+function toggleRvCard(id){
+  const card = document.getElementById(id);
+  if(!card) return;
+  const body = card.querySelector('.rv-fold-body');
+  const isOpen = card.classList.contains('open');
+  body.style.display = isOpen ? 'none' : 'block';
+  card.classList.toggle('open', !isOpen);
+}
+
+let _allCorrectOpen = false;
+function toggleAllCorrect(){
+  _allCorrectOpen = !_allCorrectOpen;
+  document.querySelectorAll('#correct-cards .rv-card-fold').forEach(card => {
+    const body = card.querySelector('.rv-fold-body');
+    body.style.display = _allCorrectOpen ? 'block' : 'none';
+    card.classList.toggle('open', _allCorrectOpen);
+  });
+  const btn = document.querySelector('[onclick="toggleAllCorrect()"]');
+  if(btn) btn.textContent = _allCorrectOpen ? '전체 접기' : '전체 펼치기';
+}
+
+/* ══════════════════════════════════════════════════════════════
    EXAM LOGIC
 ══════════════════════════════════════════════════════════════ */
 function startExam(subject){
@@ -987,12 +1109,12 @@ function finishExam(){
     if(!ok) wrongItems.push(item);
     if(flags.has(i)&&ok) flagItems.push(item);
   });
-  result={subject,elapsed,totalScore,correct:totalC,total:questions.length,passed,subjScores:ss,wrongItems,flagItems,settings,memos};
+  result={subject,elapsed,totalScore,correct:totalC,total:questions.length,passed,subjScores:ss,wrongItems,flagItems,settings,memos,questions};
   const sess={
     id:String(Date.now()),date:todayStr(),subject,
     score:totalScore,passed,elapsed,total:questions.length,
     wrongCount:wrongItems.length,flagCount:[...flags].size,
-    wrongItems,flagItems,subjScores:ss,memos,deviceType:deviceType(),
+    wrongItems,flagItems,subjScores:ss,memos,questions,deviceType:deviceType(),
   };
   const all=getSess(); all.push(sess); saveSess(all);
   saveSessionRemote(sess);
