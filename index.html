@@ -935,21 +935,15 @@ function reviewScreen(){
     }
   }
 
-  // 오답·플래그 카드 (항상 펼침)
-  const badItems=[
-    ...(src.wrongItems||[]).map(x=>({...x, type:'wrong'})),
-    ...(src.flagItems||[]).filter(x=>!wrongSet.has(x.i)).map(x=>({...x, type:'flag'})),
-  ];
-  const badCards = badItems.map(item=>makeCard(item, item.type)).join('');
+  // 전체 문항을 원래 순서대로 단일 리스트 생성
+  const allItems = allQuestions.map((q, i) => ({
+    q, i, sel: selMap[i] ?? null,
+    isCorrect: !wrongSet.has(i) && !flagSet.has(i),
+  }));
 
-  // 정답 카드 (폴딩)
-  const correctItems = allQuestions
-    .map((q, i) => ({ q, i, sel: selMap[i] ?? null }))
-    .filter(({i}) => !wrongSet.has(i) && !flagSet.has(i));
-  const correctCards = correctItems.map(item=>makeCard(item,'correct')).join('');
-
-  const totalBad=badItems.length;
-  const totalCorrect=correctItems.length;
+  const totalBad    = allItems.filter(x => !x.isCorrect).length;
+  const totalCorrect= allItems.filter(x => x.isCorrect).length;
+  const allCards    = allItems.map(item => makeCard(item, item.isCorrect ? 'correct' : 'bad')).join('');
 
   return `
   ${topbar('review')}
@@ -959,27 +953,12 @@ function reviewScreen(){
         <div class="pg-title">전체 리뷰</div>
         <div class="pg-sub">오답·플래그 ${totalBad}문제 · 정답 ${totalCorrect}문제</div>
       </div>
-      <div class="sp"></div>
-      <button class="btn btn-outline btn-sm" data-screen="home">홈으로</button>
-    </div>
-
-    ${totalBad ? `
-    <div class="rv-section-head">
-      <span class="rv-section-title">❌ 오답 · 🚩 플래그</span>
-      <span class="rv-section-cnt">${totalBad}문제</span>
-    </div>
-    ${badCards}` : `<div class="empty" style="padding:28px 0"><span class="empty-icon" style="font-size:28px">🎯</span>오답·플래그 없음</div>`}
-
-    ${totalCorrect ? `
-    <div class="rv-section-head" style="margin-top:20px">
-      <span class="rv-section-title">✅ 정답 맞힌 문제</span>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span class="rv-section-cnt">${totalCorrect}문제</span>
-        <button class="btn btn-outline btn-sm" onclick="toggleAllCorrect()">전체 펼치기</button>
+      <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+        <button class="btn btn-outline btn-sm" onclick="toggleAllCorrect()">정답 펼치기</button>
+        <button class="btn btn-outline btn-sm" data-screen="home">홈으로</button>
       </div>
     </div>
-    <div id="correct-cards">${correctCards}</div>` : ''}
-
+    <div id="correct-cards">${allCards}</div>
   </div></div>`;
 }
 
@@ -1071,7 +1050,7 @@ function toggleAllCorrect(){
     card.classList.toggle('open', _allCorrectOpen);
   });
   const btn = document.querySelector('[onclick="toggleAllCorrect()"]');
-  if(btn) btn.textContent = _allCorrectOpen ? '전체 접기' : '전체 펼치기';
+  if(btn) btn.textContent = _allCorrectOpen ? '정답 접기' : '정답 펼치기';
 }
 
 /* ══════════════════════════════════════════════════════════════
