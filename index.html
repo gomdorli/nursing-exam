@@ -75,8 +75,7 @@ textarea{resize:none}
 .btn-social:active{transform:scale(.98)}
 .btn-google{border-color:#3c4a60}
 .btn-google:hover{border-color:#4a6fa5;background:#141c2e}
-.btn-kakao{background:#FEE500;border-color:#E6CF00;color:#191919}
-.btn-kakao:hover{background:#FFD700;border-color:#D4B800}
+
 .social-icon{width:18px;height:18px;flex-shrink:0}
 
 .or-divider{display:flex;align-items:center;gap:12px;margin:14px 0;color:var(--mu);font-size:12px}
@@ -242,7 +241,6 @@ textarea{resize:none}
 .cfg-body{padding:16px 18px;display:flex;flex-direction:column;gap:10px}
 .provider-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-family:var(--mn);font-weight:600}
 .pb-google{background:#1a2444;color:#7baeff;border:1px solid #2a3a60}
-.pb-kakao{background:#332a00;color:#ffce00;border:1px solid #4a3d00}
 .pb-email{background:#1a2030;color:#99b4ff;border:1px solid #2a3050}
 
 /* ══ UTILS ═══════════════════════════════════════════ */
@@ -432,15 +430,6 @@ async function signInWithGoogle(){
   if(!sb) throw new Error('Supabase가 설정되지 않았습니다');
   const {error} = await sb.auth.signInWithOAuth({
     provider:'google',
-    options:{ redirectTo: window.location.href.split('#')[0] }
-  });
-  if(error) throw error;
-}
-
-async function signInWithKakao(){
-  if(!sb) throw new Error('Supabase가 설정되지 않았습니다');
-  const {error} = await sb.auth.signInWithOAuth({
-    provider:'kakao',
     options:{ redirectTo: window.location.href.split('#')[0] }
   });
   if(error) throw error;
@@ -667,12 +656,7 @@ function authScreen(){
           </svg>
           Google로 로그인
         </button>
-        <button class="btn-social btn-kakao" id="login-kakao">
-          <svg class="social-icon" viewBox="0 0 24 24" fill="#191919">
-            <path d="M12 3C6.477 3 2 6.477 2 10.8c0 2.725 1.674 5.117 4.2 6.558L5.1 21l4.95-2.7c.627.09 1.27.137 1.95.137 5.523 0 10-3.477 10-7.637C22 6.477 17.523 3 12 3z"/>
-          </svg>
-          카카오로 로그인
-        </button>
+
       </div>
 
       <div class="or-divider">또는 이메일로</div>
@@ -704,8 +688,6 @@ function homeScreen(){
   const provider = me?.app_metadata?.provider||'email';
   const providerChip = provider==='google'
     ? `<span class="provider-badge pb-google">G Google</span>`
-    : provider==='kakao'
-    ? `<span class="provider-badge pb-kakao">K 카카오</span>`
     : `<span class="provider-badge pb-email">✉ 이메일</span>`;
 
   const cachedSets=examSets.length?examSets:(lg(SK.sets)||[]);
@@ -926,7 +908,7 @@ function histScreen(){
 function settingsScreen(){
   const uc=getCfgUser();
   const provider=me?.app_metadata?.provider||'email';
-  const providerText=provider==='google'?'Google 계정':provider==='kakao'?'카카오 계정':'이메일';
+  const providerText=provider==='google'?'Google 계정':'이메일';
   const cachedSets=examSets.length?examSets:(lg(SK.sets)||[]);
   const setsInfo=cachedSets.length
     ? cachedSets.map(s=>`<div style="padding:3px 0;font-size:13px;color:var(--mu)">${esc(s.title)} <span class="mono" style="font-size:11px;color:var(--dm)">${esc(s.storage_path)}</span></div>`).join('')
@@ -1106,10 +1088,6 @@ function onClick(e){
   if(id==='login-google'){
     signInWithGoogle().catch(err=>{ toast('Google 로그인 실패: '+err.message) }); return;
   }
-  if(id==='login-kakao'){
-    signInWithKakao().catch(err=>{ toast('카카오 로그인 실패: '+err.message) }); return;
-  }
-
   // 이메일 로그인/가입
   if(id==='a-submit'){
     const mode=el.dataset.mode||'login';
