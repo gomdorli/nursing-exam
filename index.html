@@ -335,9 +335,11 @@ const FALLBACK = [{"year":2025,"exam_type":"지방직 9급 공개경쟁","subjec
 /* ══════════════════════════════════════════════════════════════
    CONFIG
 ══════════════════════════════════════════════════════════════ */
-const CFG_KEY = 'nx_sb_cfg_v1';
-function getCfg(){ try{return JSON.parse(localStorage.getItem(CFG_KEY))||{}}catch{return{}} }
-function saveCfg(v){ localStorage.setItem(CFG_KEY, JSON.stringify(v)) }
+// Supabase 연결 정보 (하드코딩 — 유저가 설정할 필요 없음)
+const SB_URL = 'https://towmzwffgnvhpfjkxwha.supabase.co';
+const SB_KEY = 'sb_publishable_Yf9shflv9lrvYTdoZA-XYw_54Qrr285';
+function getCfg(){ return { url: SB_URL, key: SB_KEY } }
+function saveCfg(){} // no-op
 
 /* ══════════════════════════════════════════════════════════════
    STATE
@@ -408,10 +410,8 @@ function updSync(){ const el=$('sync-el'); if(el) el.innerHTML=syncChip() }
    SUPABASE INIT & AUTH
 ══════════════════════════════════════════════════════════════ */
 function initSB(){
-  const cfg=getCfg();
-  if(!cfg.url||!cfg.key) return false;
   try{
-    sb=supabase.createClient(cfg.url, cfg.key, {
+    sb=supabase.createClient(SB_URL, SB_KEY, {
       auth: { persistSession:true, autoRefreshToken:true }
     });
     return true;
@@ -650,7 +650,6 @@ function topbar(active){
 
 /* ── AUTH ────────────────────────────────────────── */
 function authScreen(){
-  const cfg=getCfg(); const hasConn=!!(cfg.url&&cfg.key);
   return `
   <div class="auth-bg">
     <div class="auth-card">
@@ -658,8 +657,6 @@ function authScreen(){
       <div class="auth-h">시작하기</div>
       <div class="auth-sub">로그인하면 PC·모바일·태블릿에서<br>응시 기록과 메모가 자동 동기화됩니다</div>
 
-      <!-- 소셜 로그인 -->
-      ${hasConn ? `
       <div class="social-btns">
         <button class="btn-social btn-google" id="login-google">
           <svg class="social-icon" viewBox="0 0 24 24">
@@ -679,7 +676,6 @@ function authScreen(){
       </div>
 
       <div class="or-divider">또는 이메일로</div>
-      ` : ''}
 
       <div class="tab-row">
         <button class="tab-btn on" data-atab="login">로그인</button>
@@ -693,9 +689,6 @@ function authScreen(){
 
       <div class="auth-divider"></div>
       <button class="btn btn-outline btn-full btn-sm" id="a-offline">🔌 오프라인으로 계속하기</button>
-      <button class="btn btn-outline btn-full btn-sm mt8" data-screen="settings" style="margin-top:8px">⚙️ Supabase 연결 설정</button>
-
-      ${!hasConn?`<div class="auth-note">⚠️ Supabase가 연결되지 않았어요.<br>위 버튼에서 연결 정보를 입력하면<br>소셜 로그인과 동기화를 사용할 수 있어요.</div>`:''}
     </div>
   </div>`;
 }
@@ -931,7 +924,7 @@ function histScreen(){
 
 /* ── SETTINGS ────────────────────────────────────── */
 function settingsScreen(){
-  const uc=getCfgUser(); const cfg=getCfg();
+  const uc=getCfgUser();
   const provider=me?.app_metadata?.provider||'email';
   const providerText=provider==='google'?'Google 계정':provider==='kakao'?'카카오 계정':'이메일';
   const cachedSets=examSets.length?examSets:(lg(SK.sets)||[]);
@@ -951,20 +944,6 @@ function settingsScreen(){
           <div class="srow-desc">${me?providerText+' · '+syncChip():'로그인하면 동기화 가능'}</div>
         </div>
         <button class="btn btn-outline btn-sm" id="logout-btn" style="color:var(--rs);border-color:rgba(255,94,122,.4)">${me?'로그아웃':'로그인'}</button>
-      </div>
-    </div>
-
-    <div class="scard">
-      <div class="scard-title">Supabase 연결 (필수)</div>
-      <div class="cfg-body">
-        <div style="font-size:12px;color:var(--mu);line-height:1.6">
-          Google/카카오 소셜 로그인과 동기화를 사용하려면<br>
-          Supabase 프로젝트 URL과 API 키가 필요합니다.<br>
-          <b style="color:var(--am)">SETUP_GUIDE.md</b> 를 참고해 Supabase를 설정하세요.
-        </div>
-        <div class="field" style="margin:0"><label>Project URL</label><input class="txt-in" id="cfg-url" type="url" placeholder="https://xxxx.supabase.co" value="${esc(cfg.url||'')}"></div>
-        <div class="field" style="margin:0"><label>Anon Public Key</label><input class="txt-in" id="cfg-key" type="text" placeholder="eyJhbGci..." value="${esc(cfg.key||'')}"></div>
-        <button class="btn btn-primary btn-full" id="save-cfg">저장 &amp; 재연결</button>
       </div>
     </div>
 
@@ -1123,14 +1102,6 @@ function onClick(e){
   if(id==='refresh-btn'){ loadRemote().then(render); return }
   if(id==='a-offline'){ me=null; goto('home'); return }
 
-  if(id==='save-cfg'){
-    const url=($('cfg-url')?.value||'').trim();
-    const key=($('cfg-key')?.value||'').trim();
-    if(!url||!key){ toast('URL과 키를 모두 입력해주세요'); return }
-    saveCfg({url, key}); initSB(); toast('저장됐어요. 다시 로그인해주세요.');
-    setTimeout(()=>goto('auth'),700); return;
-  }
-
   // 소셜 로그인
   if(id==='login-google'){
     signInWithGoogle().catch(err=>{ toast('Google 로그인 실패: '+err.message) }); return;
@@ -1147,7 +1118,6 @@ function onClick(e){
     const errEl=$('a-err'); const okEl=$('a-ok');
     errEl.classList.remove('show'); okEl.classList.remove('show');
     if(!email||!pw){ errEl.textContent='이메일과 비밀번호를 입력해주세요'; errEl.classList.add('show'); return }
-    if(!sb){ errEl.textContent='Supabase 연결 정보를 먼저 설정해주세요'; errEl.classList.add('show'); return }
     el.classList.add('btn-spin'); el.disabled=true;
     (mode==='login'?signIn(email,pw):signUp(email,pw))
       .then(async()=>{
