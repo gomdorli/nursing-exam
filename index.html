@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0b0d14">
+<title>간호직 기출문제</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+/* ══ TOKENS ══════════════════════════════════════════ */
+:root{
+  --bg:#0b0d14;--sf:#13161f;--sf2:#1b1f2e;--sf3:#222840;
+  --bd:#252d45;--bd2:#2e3855;
+  --tx:#e4eaf7;--mu:#6b7a99;--dm:#3a4260;
+  --bl:#3d7fff;--bl2:#6ba3ff;
+  --tl:#00d4aa;--rs:#ff5e7a;--am:#ffb740;--vi:#9d7dff;
+  --r4:4px;--r8:8px;--r12:12px;--r16:16px;--r20:20px;
+  --fn:'Noto Sans KR',sans-serif;--mn:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fn);background:var(--bg);color:var(--tx);min-height:100vh;-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.6}
+button,input,textarea,select{font-family:var(--fn)}
+textarea{resize:none}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+
+/* ══ LAYOUT ══════════════════════════════════════════ */
+#root{min-height:100vh;display:flex;flex-direction:column}
+.wrap{max-width:840px;margin:0 auto;padding:0 20px;width:100%}
+.page{flex:1;padding:28px 0 80px}
+
+/* ══ TOPBAR ══════════════════════════════════════════ */
+.topbar{position:sticky;top:0;z-index:200;height:54px;background:rgba(11,13,20,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);padding-top:env(safe-area-inset-top)}
+.topbar-inner{height:54px;display:flex;align-items:center;gap:12px}
+.logo{font-family:var(--mn);font-size:13px;font-weight:600;color:var(--bl2);display:flex;align-items:center;gap:6px;flex-shrink:0}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:linear-gradient(135deg,var(--bl),var(--tl));flex-shrink:0}
+.topbar-nav{display:flex;gap:2px;margin-left:auto;align-items:center}
+.tnav{background:none;border:none;color:var(--mu);padding:6px 13px;border-radius:var(--r8);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+.tnav:hover{color:var(--tx);background:var(--sf2)}.tnav.active{color:var(--bl2);background:var(--sf2)}
+.user-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:var(--sf2);border:1px solid var(--bd2);font-size:12px;color:var(--mu);cursor:pointer;transition:all .15s;flex-shrink:0;max-width:130px;overflow:hidden}
+.user-pill:hover{color:var(--tx)}
+.up-dot{width:6px;height:6px;border-radius:50%;background:var(--tl);flex-shrink:0}
+.sync-chip{display:inline-flex;align-items:center;gap:4px;font-family:var(--mn);font-size:10px;padding:3px 8px;border-radius:20px;border:1px solid var(--bd);color:var(--mu)}
+.sync-chip.ok{color:var(--tl);border-color:rgba(0,212,170,.3);background:rgba(0,212,170,.06)}
+.sync-chip.busy{color:var(--am);border-color:rgba(255,183,64,.3);background:rgba(255,183,64,.06)}
+.sync-chip.err{color:var(--rs);border-color:rgba(255,94,122,.3);background:rgba(255,94,122,.06)}
+.sc-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;background:currentColor}
+.sync-chip.busy .sc-dot{animation:blink .8s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ══ AUTH ════════════════════════════════════════════ */
+.auth-bg{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse 80% 50% at 50% -5%,rgba(61,127,255,.14),transparent)}
+.auth-card{width:100%;max-width:420px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r20);padding:36px 32px;box-shadow:0 24px 64px rgba(0,0,0,.6)}
+.auth-logo{font-family:var(--mn);font-size:13px;font-weight:600;color:var(--bl2);display:flex;align-items:center;gap:8px;margin-bottom:24px}
+.auth-logo-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--bl),var(--tl))}
+.auth-h{font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px}
+.auth-sub{font-size:13px;color:var(--mu);margin-bottom:24px;line-height:1.55}
+
+/* 소셜 로그인 버튼 */
+.social-btns{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.btn-social{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:11px 16px;border-radius:var(--r12);
+  font-size:14px;font-weight:600;cursor:pointer;
+  border:1.5px solid var(--bd2);background:var(--sf2);
+  color:var(--tx);transition:all .15s;
+}
+.btn-social:hover{border-color:var(--bd2);background:var(--sf3);transform:translateY(-1px)}
+.btn-social:active{transform:scale(.98)}
+.btn-google{border-color:#3c4a60}
+.btn-google:hover{border-color:#4a6fa5;background:#141c2e}
+.btn-kakao{background:#FEE500;border-color:#E6CF00;color:#191919}
+.btn-kakao:hover{background:#FFD700;border-color:#D4B800}
+.social-icon{width:18px;height:18px;flex-shrink:0}
+
+.or-divider{display:flex;align-items:center;gap:12px;margin:14px 0;color:var(--mu);font-size:12px}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+/* 이메일 폼 */
+.tab-row{display:flex;background:var(--sf2);border-radius:var(--r8);padding:3px;margin-bottom:16px}
+.tab-btn{flex:1;padding:7px;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;background:transparent;color:var(--mu)}
+.tab-btn.on{background:var(--sf3);color:var(--tx)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;font-family:var(--mn);letter-spacing:.5px;color:var(--mu);margin-bottom:5px;text-transform:uppercase}
+.field input{width:100%;background:var(--sf2);border:1.5px solid var(--bd2);border-radius:var(--r12);color:var(--tx);padding:10px 14px;font-size:14px;outline:none;transition:border-color .15s}
+.field input:focus{border-color:var(--bl)}.field input::placeholder{color:var(--dm)}
+.alert{padding:10px 14px;border-radius:var(--r8);font-size:13px;margin-bottom:12px;display:none;line-height:1.5}
+.alert.show{display:block}
+.alert-err{background:rgba(255,94,122,.1);border:1px solid rgba(255,94,122,.3);color:var(--rs)}
+.alert-ok{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.3);color:var(--tl)}
+.auth-divider{height:1px;background:var(--bd);margin:16px 0}
+.auth-note{background:rgba(255,183,64,.07);border:1px solid rgba(255,183,64,.2);border-radius:var(--r8);padding:12px 14px;font-size:12px;color:var(--am);line-height:1.6;margin-top:14px}
+
+/* ══ BUTTONS ════════════════════════════════════════ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 20px;border-radius:var(--r12);font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all .15s;white-space:nowrap;line-height:1}
+.btn-primary{background:var(--bl);color:#fff}
+.btn-primary:hover:not(:disabled){background:var(--bl2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(61,127,255,.35)}
+.btn-outline{background:transparent;color:var(--mu);border:1.5px solid var(--bd2)}
+.btn-outline:hover:not(:disabled){color:var(--tx);border-color:var(--bl2)}
+.btn-sm{padding:7px 14px;font-size:13px;border-radius:var(--r8)}
+.btn-full{width:100%}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-spin{position:relative;color:transparent!important}
+.btn-spin::after{content:'';position:absolute;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ══ BADGE ══════════════════════════════════════════ */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-family:var(--mn);font-size:11px;font-weight:600;letter-spacing:.3px;flex-shrink:0}
+.b-comm{background:#0e2d55;color:#70b5ff;border:1px solid #1a3f70}
+.b-mgmt{background:#0d2e22;color:#3dd9a8;border:1px solid #1a4030}
+.b-kor{background:#2c1a3a;color:#c78fff;border:1px solid #3d2050}
+.b-eng{background:#2e2410;color:#ffb740;border:1px solid #403010}
+.b-all{background:#1a2040;color:#99b4ff;border:1px solid #252a55}
+
+/* ══ HOME ════════════════════════════════════════════ */
+.hero{padding:32px 0 24px;border-bottom:1px solid var(--bd);margin-bottom:22px}
+.hero-eyebrow{font-family:var(--mn);font-size:11px;color:var(--bl);letter-spacing:1.2px;text-transform:uppercase;display:block;margin-bottom:10px}
+.hero-title{font-size:26px;font-weight:700;letter-spacing:-.8px;margin-bottom:6px}
+.hero-sub{color:var(--mu);font-size:14px}
+.user-bar{display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 14px;background:var(--sf2);border-radius:var(--r12);border:1px solid var(--bd)}
+.user-bar-email{font-size:13px;color:var(--mu);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sec-head{font-family:var(--mn);font-size:11px;color:var(--mu);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px}
+.mode-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:10px}
+.mcard{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r16);padding:18px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px}
+.mcard::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(61,127,255,.07),transparent);opacity:0;transition:opacity .18s}
+.mcard:hover{border-color:var(--bl);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.mcard:hover::before{opacity:1}
+.mcard.wide{grid-column:1/-1;flex-direction:row;align-items:center;flex-wrap:wrap;gap:14px}
+.mcard-count{font-family:var(--mn);font-size:24px;font-weight:700;color:var(--bl2);line-height:1}
+.mcard-count sup{font-size:12px;color:var(--mu);font-weight:400}
+.mcard-label{font-size:13px;font-weight:600}
+.mcard-meta{font-size:12px;color:var(--mu);margin-top:auto}
+.set-select-wrap{margin-bottom:14px}
+.set-select{width:100%;background:var(--sf2);border:1.5px solid var(--bd2);border-radius:var(--r12);color:var(--tx);padding:10px 40px 10px 14px;font-size:14px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7a99' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;transition:border-color .15s}
+.set-select:focus{border-color:var(--bl)}
+
+/* ══ EXAM ════════════════════════════════════════════ */
+.exam-header{display:flex;align-items:center;gap:12px;padding:12px 0 14px}
+.exam-ctr{font-family:var(--mn);font-size:12px;color:var(--mu);flex-shrink:0}
+.prog{flex:1;height:4px;background:var(--sf3);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--bl),var(--vi));border-radius:2px;transition:width .3s ease}
+.timer{font-family:var(--mn);font-size:12px;font-weight:600;background:var(--sf2);border:1px solid var(--bd2);padding:4px 10px;border-radius:var(--r8);color:var(--am);flex-shrink:0}
+.exam-layout{display:block}.exam-sidebar{display:none}
+.qcard{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r20);padding:26px;margin-bottom:10px;animation:fadeUp .2s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.qhead{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.qnum{font-family:var(--mn);font-size:11px;color:var(--dm)}
+.qbody{font-size:15.5px;font-weight:500;line-height:1.78;white-space:pre-wrap;margin-bottom:22px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;border-radius:var(--r12);border:1.5px solid var(--bd);background:var(--sf2);cursor:pointer;transition:all .13s;user-select:none}
+.opt:hover:not(.locked){border-color:var(--bl);background:#131928}
+.opt.chosen{border-color:var(--bl);background:linear-gradient(135deg,#0e1d38,#111625)}
+.opt.correct{border-color:var(--tl);background:linear-gradient(135deg,#092520,#0e1820)}
+.opt.wrong{border-color:var(--rs);background:linear-gradient(135deg,#261010,#1a1010)}
+.opt.locked{cursor:default}
+.opt-n{min-width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mn);font-size:12px;font-weight:600;border:1.5px solid var(--bd2);background:var(--sf);flex-shrink:0;transition:all .13s;margin-top:1px}
+.opt.chosen .opt-n{background:var(--bl);border-color:var(--bl);color:#fff}
+.opt.correct .opt-n{background:var(--tl);border-color:var(--tl);color:#fff}
+.opt.wrong .opt-n{background:var(--rs);border-color:var(--rs);color:#fff}
+.opt-txt{font-size:14.5px;line-height:1.65;padding-top:2px}
+.act-bar{display:flex;align-items:center;gap:8px;padding:10px 0;flex-wrap:wrap}
+.flag-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r8);border:1.5px solid var(--bd);background:transparent;color:var(--mu);font-size:13px;font-weight:500;cursor:pointer;transition:all .13s}
+.flag-btn:hover,.flag-btn.on{border-color:var(--am);color:var(--am);background:rgba(255,183,64,.07)}
+.sp{flex:1}
+.memo-box{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r16);padding:14px 16px;margin-top:8px;position:relative}
+.memo-lbl{font-size:11px;color:var(--mu);font-family:var(--mn);letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.memo-sync{font-size:10px;color:var(--tl);opacity:0;transition:opacity .3s}
+.memo-sync.show{opacity:1}
+.memo-ta{width:100%;background:transparent;border:none;outline:none;color:var(--tx);font-size:13.5px;line-height:1.65;min-height:66px;max-height:140px}
+.memo-ta::placeholder{color:var(--dm)}
+.nav-lbl{font-family:var(--mn);font-size:11px;color:var(--mu);letter-spacing:1px;text-transform:uppercase;margin:16px 0 8px}
+.qdots{display:flex;flex-wrap:wrap;gap:5px}
+.qdot{width:30px;height:30px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center;font-family:var(--mn);font-size:11px;font-weight:600;border:1.5px solid var(--bd);background:var(--sf2);color:var(--dm);cursor:pointer;transition:all .12s}
+.qdot:hover{border-color:var(--bd2);color:var(--mu)}
+.qdot.ans{border-color:rgba(61,127,255,.5);color:var(--bl2);background:#0e1928}
+.qdot.flg{border-color:rgba(255,183,64,.5);color:var(--am);background:#201800}
+.qdot.cur{background:var(--bl);border-color:var(--bl);color:#fff}
+
+/* ══ RESULT ══════════════════════════════════════════ */
+.res-hero{text-align:center;padding:32px 0 22px}
+.res-emoji{font-size:44px;margin-bottom:12px}
+.res-verdict{font-family:var(--mn);font-size:36px;font-weight:700;letter-spacing:-1px;line-height:1;margin-bottom:8px}
+.res-verdict.pass{color:var(--tl)}.res-verdict.fail{color:var(--rs)}
+.res-sub{font-size:13px;color:var(--mu)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0}
+.stat{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r16);padding:16px;text-align:center}
+.stat-v{font-family:var(--mn);font-size:26px;font-weight:700;line-height:1;margin-bottom:5px}
+.stat-l{font-size:11px;color:var(--mu)}
+.subj-list{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+.subj-row{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r12);padding:12px 16px;display:flex;align-items:center;gap:12px}
+.subj-name{font-size:13px;font-weight:600;min-width:96px;flex-shrink:0}
+.bar-wrap{flex:1;height:6px;background:var(--sf3);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
+.subj-score{font-family:var(--mn);font-size:14px;font-weight:700;min-width:46px;text-align:right;flex-shrink:0}
+.pc{font-family:var(--mn);font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--r4);flex-shrink:0}
+.pc.pass{background:rgba(0,212,170,.12);color:var(--tl);border:1px solid rgba(0,212,170,.3)}
+.pc.fail{background:rgba(255,94,122,.12);color:var(--rs);border:1px solid rgba(255,94,122,.3)}
+.res-note{font-size:12px;color:var(--mu);margin:4px 0 16px}
+.res-btns{display:flex;gap:10px;flex-wrap:wrap}
+
+/* ══ REVIEW ══════════════════════════════════════════ */
+.rv-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r16);padding:20px;margin-bottom:12px}
+.rv-tags{display:flex;align-items:center;gap:7px;margin-bottom:12px;flex-wrap:wrap}
+.rtag{padding:3px 9px;border-radius:var(--r4);font-family:var(--mn);font-size:10px;font-weight:700}
+.rtag-w{background:rgba(255,94,122,.12);color:var(--rs);border:1px solid rgba(255,94,122,.3)}
+.rtag-f{background:rgba(255,183,64,.12);color:var(--am);border:1px solid rgba(255,183,64,.3)}
+.rv-q{font-size:15px;font-weight:500;line-height:1.75;white-space:pre-wrap;margin-bottom:14px}
+.rv-opts{display:flex;flex-direction:column;gap:5px}
+.ropt{padding:9px 12px;border-radius:var(--r8);font-size:13.5px;display:flex;gap:10px;align-items:flex-start}
+.ropt-c{background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2)}
+.ropt-w{background:rgba(255,94,122,.08);border:1px solid rgba(255,94,122,.2)}
+.ropt-n{background:var(--sf2);border:1px solid var(--bd);opacity:.4}
+.ropt-num{font-family:var(--mn);font-size:11px;flex-shrink:0;margin-top:1px;min-width:16px}
+.rv-memo{margin-top:10px;padding:9px 12px;border-radius:var(--r8);background:var(--sf2);border-left:2px solid var(--bd2);font-size:13px;color:var(--mu);line-height:1.6}
+
+/* ══ HISTORY ════════════════════════════════════════ */
+.hist-item{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r16);padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s;margin-bottom:8px}
+.hist-item:hover{border-color:var(--bd2);transform:translateX(2px)}
+.hist-date{font-family:var(--mn);font-size:11px;color:var(--mu);min-width:74px;flex-shrink:0}
+.hist-info{flex:1;min-width:0}
+.hist-subj{font-size:14px;font-weight:600;margin-bottom:3px}
+.hist-meta{font-size:12px;color:var(--mu)}
+.hist-score{font-family:var(--mn);font-size:20px;font-weight:700;flex-shrink:0}
+.hist-dev{font-family:var(--mn);font-size:10px;padding:2px 7px;border-radius:var(--r4);background:var(--sf2);color:var(--mu);border:1px solid var(--bd);flex-shrink:0}
+
+/* ══ SETTINGS ════════════════════════════════════════ */
+.scard{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r16);overflow:hidden;margin-bottom:12px}
+.scard-title{padding:12px 18px;border-bottom:1px solid var(--bd);font-family:var(--mn);font-size:10px;color:var(--mu);letter-spacing:1.2px;text-transform:uppercase;font-weight:600}
+.srow{padding:15px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:12px}
+.srow:last-child{border-bottom:none}
+.srow-info{flex:1}.srow-lbl{font-size:14px;font-weight:500;margin-bottom:2px}.srow-desc{font-size:12px;color:var(--mu)}
+.num-in{background:var(--sf2);border:1.5px solid var(--bd2);border-radius:var(--r8);color:var(--tx);padding:7px 12px;font-size:14px;font-family:var(--mn);width:80px;text-align:center;outline:none;transition:border-color .13s}
+.num-in:focus{border-color:var(--bl)}
+.txt-in{background:var(--sf2);border:1.5px solid var(--bd2);border-radius:var(--r8);color:var(--tx);padding:8px 12px;font-size:13px;font-family:var(--mn);outline:none;transition:border-color .13s;width:100%}
+.txt-in:focus{border-color:var(--bl)}
+.cfg-body{padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.provider-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-family:var(--mn);font-weight:600}
+.pb-google{background:#1a2444;color:#7baeff;border:1px solid #2a3a60}
+.pb-kakao{background:#332a00;color:#ffce00;border:1px solid #4a3d00}
+.pb-email{background:#1a2030;color:#99b4ff;border:1px solid #2a3050}
+
+/* ══ UTILS ═══════════════════════════════════════════ */
+.flex{display:flex}.flex-1{flex:1}.ai-c{align-items:center}
+.gap8{gap:8px}.gap12{gap:12px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.fw7{font-weight:700}.fs13{font-size:13px}.mono{font-family:var(--mn)}
+.c-mu{color:var(--mu)}.c-tl{color:var(--tl)}.c-rs{color:var(--rs)}.c-am{color:var(--am)}.c-bl{color:var(--bl2)}
+.divider{height:1px;background:var(--bd);margin:18px 0}
+.empty{text-align:center;padding:52px 20px;color:var(--mu)}
+.empty-icon{font-size:40px;display:block;margin-bottom:12px}
+.pg-head{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.pg-title{font-size:20px;font-weight:700}
+.pg-sub{font-size:13px;color:var(--mu)}
+.sec-gap{margin-bottom:22px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--sf2);border:1px solid var(--bd2);border-radius:var(--r12);padding:11px 18px;font-size:13.5px;color:var(--tx);box-shadow:0 20px 60px rgba(0,0,0,.6);transition:transform .25s ease;z-index:9999;pointer-events:none}
+#toast.on{transform:translateX(-50%) translateY(0)}
+
+/* ══ BOTTOM NAV ══════════════════════════════════════ */
+.bot-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:rgba(11,13,20,.95);backdrop-filter:blur(20px);border-top:1px solid var(--bd);padding:8px 0;padding-bottom:calc(8px + env(safe-area-inset-bottom))}
+.bot-nav-in{display:flex;justify-content:space-around;max-width:480px;margin:0 auto}
+.bnav{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;color:var(--mu);padding:6px 20px;border-radius:var(--r8);font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.3px}
+.bnav-ic{font-size:20px;line-height:1}
+.bnav.active,.bnav:hover{color:var(--bl2)}
+.exam-bot{display:none;position:fixed;bottom:0;left:0;right:0;z-index:150;background:rgba(11,13,20,.96);backdrop-filter:blur(20px);border-top:1px solid var(--bd);padding:10px 16px;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+.exam-bot-in{display:flex;align-items:center;gap:8px;max-width:840px;margin:0 auto}
+
+/* ══ RESPONSIVE ══════════════════════════════════════ */
+.exam-sidebar{display:none}
+@media(hover:none) and (pointer:coarse){
+  .opt:active:not(.locked){background:var(--sf3);transform:scale(.99)}
+  .btn:active{transform:scale(.97)!important;opacity:.85}
+  .btn-social:active{transform:scale(.97)!important}
+  .mcard:active{transform:scale(.98);opacity:.9}
+  .hist-item:active{transform:translateX(4px)}
+  .qdot:active{transform:scale(.88)}
+  .bnav:active{transform:scale(.9)}
+}
+@media(min-width:600px){
+  .exam-sidebar{display:block;position:sticky;top:calc(54px + 16px);background:var(--sf);border:1px solid var(--bd);border-radius:var(--r16);padding:16px}
+  .exam-layout{display:grid;grid-template-columns:1fr 204px;gap:20px;align-items:start}
+  .exam-main{min-width:0}
+  .exam-sb-title{font-family:var(--mn);font-size:10px;color:var(--mu);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;font-weight:600}
+  .exam-sidebar .qdots{gap:4px}
+  .exam-sidebar .qdot{width:32px;height:32px;font-size:12px}
+  .hide-mob{display:none!important}
+  .mode-grid{grid-template-columns:repeat(3,1fr)}
+  .stats{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:599px){
+  .wrap{padding:0 16px}
+  body{font-size:14px}
+  .topbar-nav{display:none}
+  .bot-nav{display:block}
+  .page{padding:20px 0 calc(80px + env(safe-area-inset-bottom))}
+  .hero{padding:22px 0 18px}.hero-title{font-size:22px}
+  .mode-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .mcard{padding:14px}.mcard.wide{grid-column:1/-1;flex-direction:column;align-items:flex-start;gap:10px}
+  .exam-header{padding:10px 0 12px;gap:8px}
+  .qcard{padding:16px 14px;border-radius:var(--r16)}
+  .qbody{font-size:15px;margin-bottom:18px}
+  .opt{padding:12px 12px;gap:10px}.opt-n{min-width:26px;height:26px;font-size:11px}.opt-txt{font-size:14px}
+  .act-bar{display:none}.exam-bot{display:block}
+  .stats{grid-template-columns:repeat(2,1fr);gap:8px}
+  .stat{padding:14px 12px}.stat-v{font-size:22px}
+  .res-hero{padding:22px 0 16px}.res-verdict{font-size:28px}
+  .subj-name{min-width:76px;font-size:12px}
+  .res-btns{flex-direction:column}
+  .hist-item{padding:12px 14px;gap:10px}.hist-date{display:none}.hist-score{font-size:18px}.hist-dev{display:none}
+  .srow{padding:13px 16px}
+  .qdots{gap:4px}.qdot{width:28px;height:28px;font-size:10px;border-radius:var(--r4)}
+  .pg-head{gap:8px}
+  .auth-card{padding:28px 22px}
+}
+@media(max-width:375px){
+  .wrap{padding:0 12px}
+  .mode-grid{grid-template-columns:1fr}.mcard.wide{grid-column:1}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="toast"></div>
+<script>
+/* ══════════════════════════════════════════════════════════════
+   FALLBACK (Supabase 미연결 / 오프라인 시 사용)
+══════════════════════════════════════════════════════════════ */
+const FALLBACK = [{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":1,"content":"건설 현장 옥외 작업자가 다음 증상을 보일 때 의심되는 건강문제는?\n○ 체온이 41°C까지 상승함\n○ 땀을 흘리지 않고 피부가 건조함\n○ 중추신경계통 장애로 인해 의식을 잃음","options":["열경련(heat cramp)","열사병(heat stroke)","열실신(heat syncope)","열피로(heat exhaustion)"],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":2,"content":"보건소가 다음 SWOT 분석 결과를 근거로 수립하는 전략 유형은?\n○ 보건소 인력의 높은 전문성\n○ 정부의 보건사업 예산 확대\n○ 보건소장의 적극적 사업 의지\n○ 만성질환 관리에 대한 주민 요구도 증가","options":["Strength-Threat 전략","Strength-Opportunity 전략","Weakness-Threat 전략","Weakness-Opportunity 전략"],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":3,"content":"「국민건강증진법」에 근거한 국민건강증진종합계획(Health Plan 2030)의 총괄목표는?","options":["건강환경 조성, 출산율 제고","감염성질환 관리, 건강생활 실천","건강수명 연장, 건강형평성 제고","건강잠재력 강화, 만성퇴행성질환 관리"],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":4,"content":"지역주민이 원할 때 지리적 제한 없이 보건의료서비스를 쉽게 이용할 수 있어야 한다는 일차보건의료의 특성은?","options":["접근성","수용성","주민참여","지불부담능력"],"correct_answer":1,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":5,"content":"간호사가 가족 사정 시 지켜야 할 원칙으로 옳지 않은 것은?","options":["사정 과정에 다양한 가구원을 참여시킨다.","가족의 문제점뿐만 아니라 강점도 사정한다.","가구원 개개인보다 가족 전체에 초점을 맞춘다.","정상 가족과 비정상 가족으로 구분하여 자료를 수집한다."],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":6,"content":"지역사회에 대한 자료수집 방법 중 '차창 밖 조사'에 대한 설명으로 옳은 것은?","options":["지역사회 내 공식·비공식 지도자가 주요 정보원이다.","주민의 가치관, 규범, 상호관계 정보를 파악할 때 적합하다.","지역의 환경과 생활상 등을 비교적 단시간에 파악할 수 있다.","주민을 대상으로 구조화된 질문지를 이용하여 자료를 수집한다."],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":7,"content":"오렘(Orem) 이론에서 다음에 해당하는 자가간호요구는?\n○ 충분한 공기, 물, 영양 섭취의 유지\n○ 고립과 사회적 상호작용의 균형 유지\n○ 활동과 휴식의 균형 유지","options":["보편적(universal) 자가간호요구","발달적(developmental) 자가간호요구","상호의존적(interdependent) 자가간호요구","건강이탈(health deviation) 시 자가간호요구"],"correct_answer":1,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":8,"content":"「재난 및 안전관리 기본법」상 자연재난에 해당하지 않는 것은?","options":["미세먼지로 인한 재해","호우로 인한 재해","황사로 인한 재해","태풍으로 인한 재해"],"correct_answer":1,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":9,"content":"지역사회 보건사업을 평가할 때 결과평가 지표에 해당하는 것은?","options":["사업 인력의 전문성","대상자의 건강지식 변화","목표 대비 사업 진행률","투입 시설과 장비의 적절성"],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":10,"content":"가정폭력에 대한 삼차예방 활동에 해당하는 것은?","options":["가정폭력 예방 교육","부부간 의사소통 및 감성훈련 강화","상담과 관찰을 통한 피해자 발견","가족 학대 재발을 방지하는 사례관리"],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":11,"content":"다음 중 고위험 임신이라고 할 수 없는 것은? (단, 자연임신과 자연분만으로 제한함)","options":["당뇨병이 있는 임신부","첫 아이를 임신한 35세 임신부","비만(BMI 30 kg/m²)한 임신부","두 번의 출산 경험이 있는 임신부"],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":12,"content":"건강불평등에 관한 설명으로 옳지 않은 것은?","options":["보건의료의 형평성이 건강불평등에 영향을 미친다.","사회경제적 요인으로 인해 건강불평등이 심화될 수 있다.","지역별, 교육수준별 기대여명이나 유병률 등을 통해 판단할 수 있다.","건강 취약계층보다 불특정 다수를 대상으로 하는 정책이 효과적이다."],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":13,"content":"보건소에 대한 설명으로 옳은 것은?","options":["시·도에 1개소의 보건소를 설치한다.","보건소장은 지역보건의료계획을 5년마다 수립하여야 한다.","보건소장은 보건지소장과 건강생활지원센터장을 지휘·감독한다.","보건소는 보건복지부와 시·도 보건행정조직을 연결하는 중간 조직이다."],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":14,"content":"다음 비만 관리 프로그램의 교육 목표 중 블룸(Bloom)의 인지적 영역에 해당하는 것만을 모두 고르면?\nㄱ. 매일 3km 이상 걷는다.\nㄴ. 비만 관련 만성질환을 2개 이상 열거한다.\nㄷ. 운동에 대한 긍정적 태도를 보인다.\nㄹ. 식이 계획의 적절성을 평가한다.","options":["ㄱ, ㄴ","ㄱ, ㄷ","ㄴ, ㄹ","ㄱ, ㄴ, ㄹ"],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":15,"content":"「학교보건법령」상 학교보건 인력에 대한 설명으로 옳지 않은 것은?","options":["학교약사는 학교장이 위촉하거나 채용한다.","학교의사에는 한의사와 치과의사도 포함된다.","학교에는 1명 이상의 학교의사를 두어야 한다.","36학급 이상의 학교에는 2명 이상의 보건교사를 두어야 한다."],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":16,"content":"듀발(Duvall)의 가족생활주기별 발달과업으로 옳은 것은?","options":["신혼기 가족 - 부모의 책임에 대한 적응","학령기 가족 - 가족 내 규칙과 규범 확립","청소년기 가족 - 자녀의 사회화 교육 및 양육","노년기 가족 - 자녀 출가에 따른 부모 역할 적응"],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":17,"content":"다음 사례에 적용된 연구방법의 특징으로 옳은 것은?\n<'원인 미상 폐질환' 산모에 대한 역학 조사>\n○ '원인 미상 폐질환' 산모를 환자군에 배정하였다.\n○ 환자군과 연령, 병력 등 주요 특성이 동일하지만 폐질환이 없는 산모를 대조군에 배정하였다.\n○ 연구 대상자들이 과거에 가습기 살균제를 사용하였는지 조사하였다.\n○ 최종적으로 가습기 살균제 사용이 폐질환과 원인적 인과관계에 있다고 판단하였다.","options":["연구 과정에서 피연구자가 새로운 위험에 노출될 수 있다.","지역사회 인구를 대상으로 특정 질환의 유병률을 알 수 있다.","위험요인에 노출될 때부터 질병 진행의 전 과정을 관찰할 수 있다.","희귀한 질병 또는 잠복기간이 긴 질병의 위험요인을 파악할 수 있다."],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":18,"content":"세균성 식중독 중 독소형 식중독에 관한 설명으로 옳은 것은?","options":["균체 내 독소에 의해 발생한다.","생균이 없어도 발생할 가능성이 있다.","대부분 가열 조리하면 예방할 수 있다.","장염 비브리오 식중독은 독소형이다."],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":19,"content":"인구구조 관련 지표의 산출식으로 옳은 것은?","options":["성비 = (남성 인구 / 전체 인구) × 100","총부양비 = (65세 이상 인구 / 15~64세 인구) × 100","노령화지수 = (65세 이상 인구 / 0~14세 인구) × 100","경제활동인구비 = (경제활동인구 / 18세 이상 인구) × 100"],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"지역사회간호","number":20,"content":"건강생활지원센터에 대한 설명으로 옳은 것은?","options":["시·군·구마다 1개씩 설치·운영되고 있다.","의사를 배치하고 진료 업무를 수행한다.","「농어촌 등 보건의료를 위한 특별조치법」에 근거하여 설치한다.","지역주민의 만성질환 예방 및 건강한 생활습관 형성을 지원한다."],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":1,"content":"다음에서 설명하는 서비스의 특성은?\n서비스는 제공하는 사람에 따라 서비스의 질이 달라질 수 있으므로 표준화 작업이 필요하다.","options":["소멸성","무형성","이질성","비분리성"],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":2,"content":"간호기록 작성에 대한 설명으로 옳은 것은?","options":["간호처치를 수행하기 전에 기록한다.","공인되지 않은 약어를 사용하여 기록한다.","다른 간호사가 수행한 것을 대신 기록하지 않는다.","환자의 주관적 호소를 제외하고 객관적 사실만 기록한다."],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":3,"content":"다음에서 설명하는 환자안전 접근방법은?\n환자 안전사고의 가시적 오류와 잠재적 오류를 규명하기 위해 사고 발생 후 후향적으로 조사한다.","options":["균형성과표(BSC)","6시그마(6sigma)","근본원인분석(RCA)","오류유형과 영향분석(FMEA)"],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":4,"content":"다음에 해당하는 동기부여 이론은?\n○ 자신이 받은 보상이 비교 대상보다 과다하다고 지각하여 더 많은 업무를 맡으려고 한다.\n○ 자신이 받은 보상이 비교 대상보다 과소하다고 지각하여 추가적인 보상 기회를 찾는다.","options":["브룸(Vroom)의 기대이론","아담스(Adams)의 공정성이론","로크(Locke)의 목표설정이론","맥클리랜드(McClelland)의 성취동기이론"],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":5,"content":"직무수행평가 시 피평가자의 우수한 요소에 영향을 받아 다른 요소도 높게 평가하는 오류는?","options":["혼 효과(horn effect)","후광 효과(halo effect)","근접 착오(recency error)","중심화 경향(central tendency)"],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":6,"content":"다음을 포함하는 인적자원관리 활동은?\n○ 간호인력 산정\n○ 인력 모집 및 선발\n○ 인력 배치","options":["직무관리","확보관리","개발관리","유지관리"],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":7,"content":"관리이론 중 인간관계론에 대한 내용으로 옳은 것은?","options":["행동과 의사결정에 대한 규칙과 절차를 문서화한다.","구성원의 생산성에 비례하여 보수를 지급한다.","자원은 변환과정을 통해 제품 및 서비스로 산출된다.","구성원에 대한 관리자의 관심이 생산성을 높인다."],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":8,"content":"생명의료윤리 원칙에 대한 개념 설명으로 옳지 않은 것은?","options":["자율성 존중의 원칙 - 환자가 자신의 생각에 따라 선택하고 행동할 권리를 존중한다.","악행금지의 원칙 - 의도적으로 해를 입히는 것과 해를 입히는 위험을 초래하는 것을 금한다.","선행의 원칙 - 해악을 제거하고 적극적으로 선을 실행한다.","정의의 원칙 - 환자에게 성실하게 간호를 제공하겠다는 약속을 이행한다."],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":9,"content":"간호단위 환경관리에 대한 설명으로 옳은 것은?","options":["입원실은 300럭스(lux) 이상의 조도를 유지한다.","다인실에는 사생활 보호를 위해 커튼이나 칸막이를 설치한다.","격리실은 전실을 두어 이중문을 설치하고 항상 양압을 유지한다.","간호사실은 원활한 업무를 위해 70데시벨(decibel) 정도가 적절하다."],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":10,"content":"다음 중 집단의사결정에 비해 개인의사결정이 효과적인 경우만을 모두 고르면?\nㄱ. 신속한 의사결정을 해야 하는 경우\nㄴ. 의사결정의 수용성이 중요한 경우\nㄷ. 다양한 지식을 활용해야 하는 경우\nㄹ. 의사결정의 명료한 책임소재가 필요한 경우","options":["ㄱ, ㄷ","ㄱ, ㄹ","ㄴ, ㄷ","ㄴ, ㄹ"],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":11,"content":"카츠(Katz)의 관리기술에 대한 설명으로 옳은 것은?","options":["인간적 기술은 구성원의 업무 수행과 관련된 지식·방법·장비 등을 사용하는 능력이다.","실무적 기술은 상위 관리계층으로 올라갈수록 요구도가 높아진다.","개념적 기술은 조직을 전체로 보고 구성원의 활동을 조직 목표와 연결하여 이해하는 능력이다.","실무적 기술은 구성원과 함께 일할 수 있는 인간관계 능력이다."],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":12,"content":"다음 중 인력 충원을 위한 내부 모집의 장점은?","options":["인력 충원 비용이 절감된다.","기관에 대한 홍보 효과가 있다.","조직 내 과도한 경쟁을 예방한다.","유능한 전문가의 영입 가능성이 높아진다."],"correct_answer":1,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":13,"content":"재무상태표(대차대조표)에 대한 설명으로 옳은 것은?","options":["기업 재무구조의 건전성을 알 수 있다.","기본 요소는 수익, 비용, 당기순이익 등이다.","일정 기간 기업활동을 통해 얻어진 손익을 나타낸다.","현금의 유입과 유출을 영업·투자·재무 활동으로 표시한다."],"correct_answer":1,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":14,"content":"다음 사례에 나타난 의사소통 네트워크 유형은?\n○ 간호부는 '환자경험평가'에 대비하여 각 병동 파트장이 참여하는 팀을 구성하였다.\n○ 팀원 모두가 자유롭게 정보를 교환하고 의사소통하고 있다.","options":["Y형","사슬형","수레바퀴형","완전연결형"],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":15,"content":"간호단위 물품관리에 대한 설명으로 옳은 것은?","options":["멸균물품은 선입선출이 가능하도록 정리한다.","재고관리 시 품목별 수량 확인을 생략한다.","리넨의 1일 정수량은 사용량의 3배 이상으로 한다.","유효기간이 경과하지 않았어도 사용하지 않는 물품은 폐기한다."],"correct_answer":1,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":16,"content":"다음 중 환자 안전사고의 예방 및 감소 방안에 해당하는 것만을 모두 고르면?\nㄱ. 사건보고 및 의사소통체계를 마련한다.\nㄴ. 간호실무표준을 기초로 최선의 간호를 수행한다.\nㄷ. 기관의 정책, 규정, 지침 등을 정기적으로 숙지한다.","options":["ㄱ, ㄴ","ㄱ, ㄷ","ㄴ, ㄷ","ㄱ, ㄴ, ㄷ"],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":17,"content":"영기준 예산제(zero-based budgeting)에 대한 설명으로 옳지 않은 것은?","options":["전년도 예산에 근거하지 않고 새롭게 예산을 책정한다.","비용과 성과를 연계함으로써 예산 낭비를 줄일 수 있다.","물가상승률 등 전년 대비 증감률을 반영하여 예산을 책정한다.","기존 사업의 타당성을 재평가하므로 시간이 걸리고 복잡하다."],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":18,"content":"「의료법령」상 간호·간병통합서비스를 제공할 수 있는 의료기관이 아닌 것은?","options":["치과병원","한방병원","요양병원","종합병원"],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":19,"content":"다음에서 설명하는 데밍(Deming)의 PDCA 단계는?\n문제를 규명하고 개선 가능 분야를 검토한 후 해결 방안을 모색하고 선택한다.","options":["Plan(계획)","Do(실행)","Check(검증)","Act(개선)"],"correct_answer":1,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"간호관리","number":20,"content":"피들러(Fiedler)의 상황적합성 이론에 근거할 때, 다음 설명에서 상황 호의성과 효과적인 리더를 바르게 연결한 것은?\n○ 간호관리자와 구성원 간의 관계는 좋다.\n○ 간호업무의 구조화 정도가 높다.\n○ 간호관리자의 직위 권한이 약하다.","options":["비호의적 상황 - 과업지향적 리더","비호의적 상황 - 관계지향적 리더","호의적 상황 - 과업지향적 리더","호의적 상황 - 관계지향적 리더"],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":1,"content":"<공공언어 바로 쓰기 원칙>에 따라 수정한 것으로 적절하지 않은 것은?\n<공공언어 바로 쓰기 원칙>\n○ 표현의 정확성: ㉠의미에 맞는 정확한 단어 쓰기, ㉡부적절한 피·사동 표현에 유의함.\n○ 여러 뜻으로 해석되는 표현 삼가기: ㉢하나의 뜻으로 해석되는 문장을 사용함.\n○ 대등한 것끼리 접속: ㉣'－고', '－(으)며', '와/과' 등으로 접속되는 말에는 구조가 같은 표현을 사용함.","options":["\"...환급할 예정이다.\"를 ㉠에 따라 \"...환수할 예정이다.\"로 수정한다.","\"...배제시켜야 한다.\"를 ㉡에 따라 \"...배제해야 한다.\"로 수정한다.","\"시의회는 관련 단체와 시민들을 초청하기로...\"를 ㉢에 따라 \"...관련 단체와 협의하여 시민들을 초청하기로...\"로 수정한다.","\"사업 전체 목표 수립과 세부 사업별 추진 전략을 제시한다.\"를 ㉣에 따라 \"사업 전체 목표를 수립하고 세부 사업별 추진 전략을 제시한다.\"로 수정한다."],"correct_answer":1,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":2,"content":"다음 글을 이해한 내용으로 가장 적절한 것은?\n[김삿갓으로 알려진 김병연의 집안...김익순의 이러한 행적이 드러나 결국 그는 모든 재산이 몰수되고 사형을 당했다. 이후 김병연은 대역죄로 사형당한 인물의 후손이라는 오명을 쓰고 살아갈 수밖에 없었다. 그가 당대의 주류 세력과 관계를 맺지 못한 것도 이 때문이었다.]","options":["김시태의 후손은 아무도 관직에 나아가지 못했다.","김익순은 김시태의 죄상이 드러나 재산이 몰수되었다.","김병연은 자신의 조상이 신임사화에 연루되어 세상을 떠돌게 되었다.","김병연은 대역죄인의 후손이어서 당대 주류 세력과 관계를 맺을 수 없었다."],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":3,"content":"다음 중 ㉠에 해당하는 사례로 적절한 것은?\n[...㉠동음이의 현상은 먹는 '배'와 타는 '배'가 구별되는 것과 같이 서로 무관한 두 의미가 우연히 같은 형태로 나타난 것이다.]","options":["그는 여러 문화를 비교적 관점에서 연구했다. / 삼촌은 교통이 비교적 편리한 곳에 산다.","내가 언니보다 키가 더 크다. / 이번 여름에는 비가 많이 와서 마당의 풀이 잘 큰다.","오늘이 드디어 기다리던 시험일이다. / 친구는 국립 박물관에 오늘 갈 것이라 한다.","나는 어제 산 모자를 쓰고 나갔다. / 형님은 시를 쓰고 누님은 그림을 그렸다."],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":4,"content":"<지침>에 따라 <개요>를 작성할 때 (가)~(라)에 들어갈 내용으로 적절하지 않은 것은?\n[제목: 국내 방송 산업의 친환경 제작 현황과 그 확산을 위한 정책 지원 방안\n1장 서론: 1.환경 위기에 대응하기 위한 해외 방송 산업의 정책 변화 / 2.(가)\n2장 국내 방송 산업의 친환경 제작 현황: 1.(나) / 2.국내 친환경 방송 제작 관련 전문 인력 부재\n3장 ...정책 지원 방안: 1.국내 방송 산업의 특성을 반영한 친환경 제작 지침의 마련 / 2.(다)\n4장 결론: 1.(라) / 2.현장 적용을 위한 정책 실행의 단계적 평가 및 개선]","options":["(가): 국내 방송 산업의 친환경 제작 전략의 필요성","(나): 국내 방송 산업 내 친환경 제작을 위한 지침 부재","(다): 국내 친환경 방송 제작 관련 전문 인력 채용의 제도화","(라): 친환경 방송 제작을 위한 세부 지침과 인력 채용 방안 제시"],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":5,"content":"다음 글의 ㉠~㉣ 중 문맥상 어색한 곳을 수정한 것으로 가장 적절한 것은?\n[면역반응에는 '자연면역'과 '획득면역'이 있다...㉠직접적인 일대일 반응 관계가 존재하지 않는다...㉡외부 미생물이 어떤 종류인지에 관계없이 대상을 제거한다...㉢항원의 종류와 무관하게 특정 항원에 대해 여러 종류의 항체가 반응한다...㉣항원 수용체는 세포 표면에 형성되는 단백질의 일종으로, 항원에 의해 자극된다.]","options":["㉠: 직접적인 일대일 반응 관계가 존재한다","㉡: 특정한 외부 미생물에 유일하게 반응하며 그 외의 대상은 제거하지 않는다","㉢: 특정 항체가 특정 항원에 대해서만 반응한다","㉣: 항원 수용체는 세포 내부에 형성되는 단백질의 일종으로, 항체에 의해 자극된다"],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":6,"content":"(가)~(라)를 맥락에 맞추어 가장 적절하게 나열한 것은?\n(가) 픽셀 단위로 수치화된 이미지 데이터는 하나의 긴 데이터 형태로 컴퓨터에 저장된다...\n(나) 높은 해상도의 구현은 데이터 저장 용량의 문제를 일으켰고...\n(다) 컴퓨터에서 이미지를 처리하기 위해서는 아날로그 영상 신호를 디지털로 변환하는 과정을 거쳐야 한다...\n(라) 하지만 현재는 컴퓨터 비전 기술이 발달하면서 하나의 픽셀에 여러 색상의 정보를 담게 되었다...","options":["(나) - (가) - (라) - (다)","(나) - (다) - (가) - (라)","(다) - (가) - (라) - (나)","(다) - (라) - (가) - (나)"],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":7,"content":"[7~8] 영웅 소설과 판소리계 소설의 세계 구조에 관한 지문\n\n윗글을 이해한 내용으로 적절하지 않은 것은?","options":["영웅 소설은 이원적 세계상을 잘 보여 주는 문학적 갈래이다.","판소리계 소설에서 서사의 인과 관계는 경험적 현실에 바탕을 둔 경우가 많다.","천상계의 대리자가 지상계의 서사를 결정하는 작품에서는 이원적 세계상이 발견된다.","영웅 소설에 비해 판소리계 소설에서는 초월적 세계가 현실의 문제를 해결하는 양상이 두드러진다."],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":8,"content":"윗글의 문맥상 ㉠의 의미와 가장 가까운 것은?\n[천상계는 지상에서 ㉠일어나는 모든 사건의 발생과 귀결을 지배하는 초월적 세계로서...]","options":["언니는 뽀얗게 일어나는 물보라에 손을 대었다.","그는 가까스로 일어나는 불꽃을 바라보고 있었다.","아침 일찍 일어나는 습관을 들이는 것이 중요하다.","싸움이 일어나는 동안 그는 숨어 있을 수밖에 없었다."],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":9,"content":"다음 진술이 모두 참일 때 반드시 참인 것은?\n○ 영희가 친구 혹은 선생님을 만났다면, 영희는 커피를 마셨다.\n○ 영희는 친구 혹은 선배를 만났다.\n○ 영희는 커피를 마신 적이 없다.","options":["영희는 선배를 만났다.","영희는 친구를 만났다.","영희는 선생님을 만났다.","영희는 선배와 선생님을 모두 만났다."],"correct_answer":1,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":10,"content":"[10~11] 이광수와 김동인의 표준어/사투리 사용에 관한 지문\n\n윗글을 이해한 내용으로 가장 적절한 것은?","options":["「배따라기」는 표준어를 사용하여 작품의 리얼리티를 확보하였다.","「무정」에는 근대적 가치의 실현과 관련된 작가의 의도가 담겨 있다.","「토지」는 '서희'의 사투리 사용을 통해 작품의 리얼리티를 구현하였다.","작품의 리얼리티를 기준으로 할 때, 「무정」이 「배따라기」보다 더 뛰어나다."],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":11,"content":"윗글의 ㉠~㉣과 바꿔 쓸 수 있는 유사한 표현으로 적절하지 않은 것은?\n㉠맞는 / ㉡나타내는 / ㉢떠올리면 / ㉣뚜렷하게","options":["㉠: 영합(迎合)하는","㉡: 표상(表象)하는","㉢: 상기(想起)하면","㉣: 분명(分明)하게"],"correct_answer":1,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":12,"content":"[12~13] 재화와 상품, 자본주의에 관한 지문\n\n윗글에서 추론한 내용으로 가장 적절한 것은?","options":["사회주의에서는 유통이 생산보다 중요하다.","상품이 존재한다는 것은 시장이 형성되어 있다는 것이다.","자본주의가 성숙할수록 제조업과 유통업의 이윤 차이는 줄어든다.","중세의 상인들은 물건의 생산 단가를 낮추기 위해 시장에 팔 물건을 손수 생산하였다."],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":13,"content":"윗글의 ㉠~㉣ 중 문맥상 의미가 나머지와 다른 하나는?\n[㉠물건을 싸게 사서 비싸게 파는 상인 / ㉡상품에 기초한 사회 / ㉢집에서 쓰기 위해 만든 의자 / ㉣자본주의 사회에서 생산되는 물품의 유통을 맡은 사람]","options":["㉠","㉡","㉢","㉣"],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":14,"content":"다음 글에서 추론한 내용으로 적절하지 않은 것은?\n[모든 기호에는 정보성, 즉 의미가 있다...기호는 정보성만 가진 기호와 정보성도 가진 의사소통적 기호로 구분된다...인간의 언어는 가장 복잡하고 체계적인 관습적 기호이며 의사소통적 기호이다.]","options":["전쟁 중에 군대에서 사용하는 암호는 관습적 기호이다.","일기예보에서 흐린 날씨를 표시하는 구름 모양의 아이콘은 자연적 기호이다.","특정 질병에 걸렸을 때 나타나는 얼굴색은 정보성만을 가진 기호이다.","이웃 마을과 구별하기 위해 마을의 명칭을 본떠 만든 상징탑은 의사소통적 기호이다."],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":15,"content":"다음 글의 (가), (나)에 들어갈 말을 적절하게 나열한 것은?\n[자아 개념이란...나에게 (가)의 말은 기억에 오래 남기 마련이다. 한편, 타인에게 영향을 받는 자아를 설명하는 개념 중에는 (나)라는 것도 있다...]","options":["관련이 적은 타인 / 거울에 비친 자아","중요한 타인 / 모범적인 타인을 따르는 자아","관련이 적은 타인 / 모범적인 타인을 따르는 자아","중요한 타인 / 거울에 비친 자아"],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":16,"content":"다음 글의 밑줄 친 결론을 이끌어 내기 위해 추가해야 할 것은?\n[마라톤을 하는 사람은 모두 식단을 조절하거나 근력 운동을 한다. 근력 운동을 하는 사람은 모두 건강하다. 따라서 마라톤을 하는 사람은 모두 건강하다.]","options":["건강한 사람은 모두 식단을 조절한다.","식단을 조절하는 사람은 모두 건강하다.","식단을 조절하는 사람 중에 근력 운동을 하는 사람은 없다.","식단 조절과 근력 운동을 병행하는 사람 중에 건강하지 않은 사람은 없다."],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":17,"content":"다음 대화를 분석한 내용으로 적절하지 않은 것은?\n[갑: 언어는 인간의 지각과 사고, 세계관 등을 결정해...\n을: 나는 동의할 수 없어. 언어는 인간의 사고를 표현하는 도구에 불과해...\n병: 그렇긴 하지...나는 언어가 사고에 영향을 미친다는 것도 동의해...]","options":["언어와 사고가 서로 영향을 주고받는 관계라는 점에 대해 갑과 을은 동의하지 않지만 병은 동의한다.","사고가 언어에 영향을 미친다는 점에 대해 갑은 동의하지만 을은 동의하지 않는다.","언어가 다르면 세계를 다르게 인식한다는 점에 대해 갑과 병은 동의한다.","사고의 차이가 언어의 차이를 낳는다는 점에 대해 을과 병은 동의한다."],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":18,"content":"다음 대화에 대한 평가로 적절한 것만을 모두 고르면?\n[갑: \"건강해라.\"라는 표현이 잘못됐다는 친구의 말...\n을: 문법 규범에 어긋난 표현은 쓰면 안 돼...\n갑: 문법 규범에 맞지 않더라도 사용하지 말아야 하는 것은 아니야...\nㄱ. '쓰여지다' 같은 이중 피동 관련 주장 / ㄴ. \"행복해라.\" 관련 주장 / ㄷ. '맨날'이 표준어로 인정된 사실]","options":["ㄷ","ㄱ, ㄴ","ㄱ, ㄷ","ㄱ, ㄴ, ㄷ"],"correct_answer":1,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":19,"content":"다음 대화의 (가)에 들어갈 말로 적절한 것은?\n[갑: 공무원은 공직자이고 공직자는 그 직책만으로 공인이야...공무원이 아닌 사람이라면 그게 누구든 그런 사명감을 가질 의무는 없지.\n을: \"공무원이 아닌 모든 사람은 공인으로서의 사명감을 가질 의무가 없다.\"라는 주장을 하려면 \"(가).\"가 참이어야 해.]","options":["몇몇 공인은 공인으로서의 사명감을 가질 의무가 없다","모든 공무원은 공인으로서의 사명감을 가질 의무가 없다","공인으로서의 사명감을 가질 의무가 있는 사람은 모두 공무원이다","공인으로서의 사명감을 가질 의무가 없는 사람은 모두 공무원이 아니다"],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"국어","number":20,"content":"다음 글의 논지를 약화하는 것으로 가장 적절한 것은?\n[인공일반지능의 개발이 허용된다면...인간의 본질적 가치가 훼손된다...인공일반지능의 개발은 허용될 수 없다.]","options":["인공일반지능의 수준에 미치지 못하는 특정 분야 인공지능만으로도 많은 사람이 일자리를 잃고 소외감을 느끼고 있다.","인공지능 연구로 노벨 물리학상을 받은 H는 인공지능 기술이 인간의 존재론적 지위에 위협이 될 것이라며 개발을 멈춰야 한다고 주장한다.","현재 상용화되어 있는 대화형 인공지능은 마음의 상처를 입은 사람들에게 위안을 주어 사람들이 본질적 가치를 회복하는 데 도움을 주고 있음이 입증되었다.","유관 학회 전문가들을 대상으로 한 설문에서, 인공일반지능의 개발이 인간의 본질적 가치를 훼손할 가능성이 높다고 응답한 사람들이 압도적으로 많았다."],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":1,"content":"밑줄 친 부분에 들어갈 말로 가장 적절한 것을 고르시오.\nSome plant diseases are indeed difficult to ___________ because they can spread rapidly and easily, impacting multiple plants in a vast area.","options":["nourish","eradicate","proliferate","detect"],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":2,"content":"밑줄 친 부분에 들어갈 말로 가장 적절한 것을 고르시오.\nIn the business world, ___________ is highly valued as it showcases a person's commitment to meeting deadlines and respecting others' time.","options":["humility","sincerity","frugality","punctuality"],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":3,"content":"밑줄 친 부분에 들어갈 말로 가장 적절한 것을 고르시오.\nPreliminary investigations indicate that some, if not all, of the clients' money, ___________ to be $6 million in total, has found its way into unquoted companies and property purchases.","options":["believe","believing","believed","believes"],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":4,"content":"다음 대화의 빈칸에 들어갈 말로 가장 적절한 것을 고르시오.\n[Yuna: Hi Jenny, I need your advice on buying a car.\nJenny: Hi, do you want to buy a car? What kind of car?\nYuna: Maybe a mid-sized sedan or an SUV.\nJenny: An SUV is more practical.\nYuna: SUVs are more expensive than sedans. _______\nJenny: One of my friends is a used car dealer. He can give you a good deal.]","options":["I'm on a tight budget","I need to get in shape","It should clear up soon","I can pick you up later"],"correct_answer":1,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":5,"content":"다음 대화의 빈칸에 들어갈 말로 가장 적절한 것을 고르시오.\n[A: How many copies of the presentation materials do you think we'll need?\nB: 60 should be enough, but it's always good to have extras.\nA: True. Better safe than sorry. How many would you recommend then?\nB: Let's make it 75 just in case we have more attendees than expected like last time.\nA: Good idea. _______?\nB: Absolutely. We are going to have people asking for the presentation materials after the presentation.]","options":["How early do we need to distribute the materials","Should we also have a digital version for sharing","Will the materials be printed in color or black and white","Are there any specific materials we should avoid including"],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":6,"content":"[6~7] 다음 공지 글을 읽고 물음에 답하시오.\n[We have been notified of a scam targeting people through text messages requesting they pay an overdue parking ticket. These text messages are not from us. Do not click the link or provide payment details. Report these messages to your cell phone provider and then delete them. We do not notify the public of fines through texting, media, or social media. City-approved notification methods: Ticket served to vehicle / Ticket sent by post to registered owner of vehicle]\n\n(A)에 들어갈 윗글의 제목으로 가장 적절한 것은?","options":["City Parking Ticket Payment Methods","How to Avoid Getting Parking Tickets","Save Time and Money! Helpful Parking Tips","Alert! Fake Parking Ticket Payment Text Messages"],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":7,"content":"윗글의 내용과 일치하는 것은?","options":["전달된 링크에 결제 세부 정보를 입력해야 한다.","수신한 문자는 삭제하면 안 된다.","시에서는 벌금을 문자로 통보한다.","고지서는 등록된 차량 소유주에게 우편으로 발송된다."],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":8,"content":"[8~9] Health for People 웹사이트 지문\n[People should be able to live a happy, healthy, and prosperous life. Health is a substantial part of human right, and makes a critical contribution to societal well-being...]\n\n밑줄 친 critical의 의미와 가장 가까운 것은?","options":["pivotal","perilous","analytical","judgmental"],"correct_answer":1,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":9,"content":"윗글의 목적으로 가장 적절한 것은?","options":["의료비 지원이 필요한 사람들을 위한 기부를 독려하려고","행복하고 건강한 삶을 위한 캠페인을 제안하려고","NHC를 지원하는 기관을 소개하려고","NHC의 파트너를 선정하려고"],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":10,"content":"다음 글의 목적으로 가장 적절한 것은?\n[Dear Mr. Charles Brown, I am writing to thank you for the interview last week...I would like to follow up now to see if there are any updates regarding the status of my application...Sincerely, Tom Smith]","options":["to submit an application form","to set up an interview appointment","to inquire about updates on the decision process","to request more information about the company's business"],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":11,"content":"다음 글에서 The National Independence Museum에 대한 내용과 일치하는 것은?\n[The National Independence Museum preserves the national history through exhibitions, research, and educational programs...A total of 150,000 relics of the independence movement are displayed in eight exhibition halls...Regular cultural events are held...]","options":["It is located in an urban environment surrounded by many skyscrapers.","It displays more than a million artifacts related to the independence movement.","It supports educational activities instead of scholarly projects.","It offers visitors cultural events on a regular basis."],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":12,"content":"다음 글(The Largest Aviation Collectibles Show 안내문)의 내용과 일치하지 않는 것은?\n[When: Saturday, September 6, 2025 / $10 Admission, Children under 12 Free / Hourly Door Prizes / Over 90 Tables of Hard-to-find Airline and Transportation Collectibles / Domestic and Foreign Airline Collectibles]","options":["The East Coast's biggest aviation collectibles show will take place in September.","Door prizes are exclusively for children under 12.","Rare airline and transportation collectibles will be displayed at the show.","Visitors can see both national and international collectibles."],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":13,"content":"밑줄 친 부분 중 어법상 옳지 않은 것을 고르시오.\nWe tend ①to imagine Robin Hood and outlaws in general as fugitives because they defied the king's officials and operated ②outside the law in the great forests of the kingdom. What we forget is that there ③were an established process behind the creation of outlaws. On the whole, men did not choose to become outlaws; they ④were made outlaws.","options":["①to imagine","②outside the law","③were","④were made"],"correct_answer":3,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":14,"content":"밑줄 친 부분 중 어법상 옳지 않은 것을 고르시오.\nThe olive tree was ①such a driving force in the economies of the Ancient Greek city-states ②that it was believed ③to have been a gift of gods―namely from Athena, the goddess of wisdom, ④whom Athens took its name.","options":["①such a driving force","②that","③to have been","④whom"],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":15,"content":"다음 글의 주제로 가장 적절한 것은?\n[The reason artificial blue light in devices can be so harmful in the evening is that it mimics the sun's natural blue light...packing the day with sunshine creates a blue-light build-up that helps counteract the consequences of that artificial light at night.]","options":["Sunlight's help in fighting artificial blue light effects","The dangers of using devices during the day","How screens affect children's sleep cycles","Why melatonin levels drop in the evening"],"correct_answer":1,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":16,"content":"주어진 글 다음에 이어질 글의 순서로 가장 적절한 것은?\n[Usually toddlers picking things up from the ground means trouble.\n(A) The family reported the find to the Israel Antiquities Authority...\n(B) But as 3-year-old Ziv Nitzan of Israel brushed away the sand..., she revealed a nearly 4,000-year-old Egyptian artifact.\n(C) Ziv was awarded a certificate for good citizenship...]","options":["(A) - (C) - (B)","(B) - (A) - (C)","(B) - (C) - (A)","(C) - (B) - (A)"],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":17,"content":"주어진 문장이 들어갈 위치로 가장 적절한 것은?\n[However, according to Mike Tipton, a professor at University of Portsmouth, this is far from the quickest way of lowering your body temperature.]\n\n[There are plenty of simple, scientifically supported techniques... ( ① ) If you're feeling the heat and somebody offers you a fan... ( ② ) Certainly, all that breeze on your face will stimulate cold receptors... But actually, it's not going to extract the heat from your body. Instead, a better cooling strategy is to immerse your hands in cold water... ( ③ ) Your hands have a high surface area to mass area... ( ④ ) If your core temperature is hot, your body will send blood to the extremities...]","options":["①","②","③","④"],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":18,"content":"다음 글의 흐름상 어색한 문장은?\n[Scientists in the UK grew special tomatoes with extra vitamin D... ①Tomatoes naturally contain a substance that gets converted into vitamin D. ②The team altered the genes of the tomato plants... ③Each tomato came to have about as much vitamin D as two medium-sized eggs. ④Moreover, tomatoes are commonly eaten raw in salads and served as a cooked vegetable. The scientists think the technique could be used with other foods, too.]","options":["①","②","③","④"],"correct_answer":4,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":19,"content":"밑줄 친 부분에 들어갈 말로 가장 적절한 것을 고르시오.\n[A hunter-gatherer in the Stone Age...We think we know a lot, even though individually we know very little, because we treat knowledge ___________________________ as if it were our own.]","options":["from hands-on experiences","in the minds of others","gained during education","learned through trial and error"],"correct_answer":2,"explanation":null},{"year":2025,"exam_type":"지방직 9급 공개경쟁","subject":"영어","number":20,"content":"밑줄 친 부분에 들어갈 말로 가장 적절한 것을 고르시오.\n[A gazelle on the African savanna...We use our intellects not to solve practical problems but to outwit each other...So what matters is ________________________________.]","options":["not how clever and crafty you are but how much more clever and craftier you are than other people","that individuals act according to their collective interest rather than their own personal interest","to design a society where members cooperate to find optimal solutions to benefit themselves","coming up with the best solution to practical problems in a given condition"],"correct_answer":1,"explanation":null}];
+
+/* ══════════════════════════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════════════════════════ */
+const CFG_KEY = 'nx_sb_cfg_v1';
+function getCfg(){ try{return JSON.parse(localStorage.getItem(CFG_KEY))||{}}catch{return{}} }
+function saveCfg(v){ localStorage.setItem(CFG_KEY, JSON.stringify(v)) }
+
+/* ══════════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════════ */
+let sb = null;
+let me = null;
+let screen = 'auth';
+let DATA = [...FALLBACK];
+let examSets = [];
+let activeSetId = null;
+let exam = null;
+let result = null;
+let reviewSrc = null;
+let timer = null;
+let memoTimer = null;   // 메모 debounce 타이머
+let syncSt = 'idle';    // idle|busy|ok|err|offline
+
+/* ══════════════════════════════════════════════════════════════
+   LOCAL STORAGE
+══════════════════════════════════════════════════════════════ */
+const SK = {
+  sessions: 'nx_sessions_v5',
+  cfg:      'nx_user_cfg_v1',
+  data:     'nx_exam_data_v2',
+  sets:     'nx_exam_sets_v1',
+  memos:    'nx_memos_v1',     // 로컬 메모 캐시 { questionKey: content }
+};
+const lg  = k => { try{return JSON.parse(localStorage.getItem(k))||null}catch{return null} };
+const ls  = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+const getSess    = () => lg(SK.sessions)||[];
+const saveSess   = v  => ls(SK.sessions, v);
+const getCfgUser = () => ({minSub:40, minTotal:60, ...(lg(SK.cfg)||{})});
+const saveCfgUser= v  => ls(SK.cfg, v);
+const getLocalMemos = () => lg(SK.memos)||{};
+const saveLocalMemos= v  => ls(SK.memos, v);
+
+/* ══════════════════════════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════════════════════════ */
+const $   = id => document.getElementById(id);
+const esc = s  => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const pad = n  => String(n).padStart(2,'0');
+const hms = s  => `${pad(Math.floor(s/60))}:${pad(s%60)}`;
+const todayStr  = () => { const d=new Date(); return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}` };
+const deviceType= () => { const ua=navigator.userAgent; if(/iPad|Tablet/i.test(ua))return'tablet'; if(/iPhone|Android.*Mobile/i.test(ua))return'mobile'; return'desktop' };
+const subBadge  = s => s.includes('지역')?'b-comm':s.includes('간호관')?'b-mgmt':s.includes('국어')?'b-kor':s.includes('영어')?'b-eng':'b-all';
+const subColor  = s => s.includes('지역')?'#3d7fff':s.includes('간호관')?'#00d4aa':s.includes('국어')?'#9d7dff':s.includes('영어')?'#ffb740':'#6ba3ff';
+
+// 문항 고유 키 (메모 동기화에 사용)
+const qKey = (q) => `${q.year||2025}_${q.subject}_${q.number}`;
+
+function toast(msg, dur=2400){
+  const t=$('toast'); t.textContent=msg; t.classList.add('on');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'),dur);
+}
+function goto(s){ clearTimer(); screen=s; render(); window.scrollTo({top:0,behavior:'smooth'}) }
+function clearTimer(){ if(timer){clearInterval(timer);timer=null} }
+
+function syncChip(){
+  const map={idle:'',busy:'busy',ok:'ok',err:'err',offline:'err'};
+  const lbl={idle:'',busy:'동기화 중',ok:'동기화됨',err:'오류',offline:'오프라인'};
+  const cls=map[syncSt]; if(!cls) return '';
+  return `<span class="sync-chip ${cls}"><span class="sc-dot"></span>${lbl[syncSt]}</span>`;
+}
+function updSync(){ const el=$('sync-el'); if(el) el.innerHTML=syncChip() }
+
+/* ══════════════════════════════════════════════════════════════
+   SUPABASE INIT & AUTH
+══════════════════════════════════════════════════════════════ */
+function initSB(){
+  const cfg=getCfg();
+  if(!cfg.url||!cfg.key) return false;
+  try{
+    sb=supabase.createClient(cfg.url, cfg.key, {
+      auth: { persistSession:true, autoRefreshToken:true }
+    });
+    return true;
+  }catch(e){ console.warn('SB init fail',e); return false }
+}
+
+async function checkSession(){
+  if(!sb) return false;
+  try{
+    const {data:{session}} = await sb.auth.getSession();
+    if(session){ me=session.user; return true }
+  }catch(e){ console.warn(e) }
+  return false;
+}
+
+// 소셜 로그인 (OAuth 리다이렉트)
+async function signInWithGoogle(){
+  if(!sb) throw new Error('Supabase가 설정되지 않았습니다');
+  const {error} = await sb.auth.signInWithOAuth({
+    provider:'google',
+    options:{ redirectTo: window.location.href.split('#')[0] }
+  });
+  if(error) throw error;
+}
+
+async function signInWithKakao(){
+  if(!sb) throw new Error('Supabase가 설정되지 않았습니다');
+  const {error} = await sb.auth.signInWithOAuth({
+    provider:'kakao',
+    options:{ redirectTo: window.location.href.split('#')[0] }
+  });
+  if(error) throw error;
+}
+
+// 이메일/비밀번호
+async function signIn(email, pw){
+  if(!sb) throw new Error('Supabase가 설정되지 않았습니다');
+  const {data,error} = await sb.auth.signInWithPassword({email,password:pw});
+  if(error) throw error;
+  me=data.user;
+}
+async function signUp(email, pw){
+  if(!sb) throw new Error('Supabase가 설정되지 않았습니다');
+  const {error} = await sb.auth.signUp({email,password:pw});
+  if(error) throw error;
+}
+async function signOut(){
+  if(sb) await sb.auth.signOut().catch(()=>{});
+  me=null; goto('auth');
+}
+
+// 소셜 로그인 후 URL hash 처리
+async function handleAuthCallback(){
+  if(!sb) return false;
+  const hash=window.location.hash;
+  // Supabase v2 는 URL fragment로 session 전달
+  if(hash.includes('access_token')||hash.includes('error')){
+    const {data:{session},error} = await sb.auth.getSession();
+    // hash 제거
+    history.replaceState(null,'',window.location.pathname+window.location.search);
+    if(error||!session) return false;
+    me=session.user; return true;
+  }
+  return false;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REMOTE DATA SYNC
+══════════════════════════════════════════════════════════════ */
+async function loadRemote(){
+  if(!sb||!me){ syncSt='offline'; updSync(); return }
+  syncSt='busy'; updSync();
+  try{
+    // 1. 설정
+    const {data:cfg} = await sb.from('user_settings').select('*').eq('user_id',me.id).single();
+    if(cfg) saveCfgUser({minSub:cfg.min_subject, minTotal:cfg.min_total});
+
+    // 2. 응시 기록
+    const {data:rows} = await sb.from('sessions').select('*')
+      .eq('user_id',me.id).order('created_at',{ascending:false}).limit(100);
+    if(rows?.length){
+      saveSess(rows.map(r=>({
+        id:r.id, date:r.created_at.slice(0,10).replace(/-/g,'.'),
+        subject:r.subject, year:r.year,
+        score:r.score, passed:r.passed, elapsed:r.elapsed,
+        wrongCount:r.wrong_count, flagCount:r.flag_count,
+        wrongItems:r.wrong_items||[], flagItems:r.flag_items||[],
+        subjScores:r.subj_scores||{}, memos:r.memos||{},
+        deviceType:r.device_type||'desktop',
+      })));
+    }
+
+    // 3. 메모 동기화 (DB → 로컬)
+    const {data:memoRows} = await sb.from('memos').select('*').eq('user_id',me.id);
+    if(memoRows?.length){
+      const memoMap={};
+      memoRows.forEach(m=>{ memoMap[m.question_key]=m.content; });
+      saveLocalMemos(memoMap);
+    }
+
+    // 4. 시험 회차
+    const {data:sets} = await sb.from('exam_sets').select('*')
+      .eq('is_active',true).order('year',{ascending:false});
+    if(sets?.length){
+      examSets=sets; ls(SK.sets, sets);
+      await loadExamJson(sets[0]);
+    }
+
+    syncSt='ok'; updSync();
+  }catch(e){
+    console.warn('loadRemote fail',e);
+    syncSt=navigator.onLine?'err':'offline'; updSync();
+    const cached=lg(SK.sets); if(cached) examSets=cached;
+    DATA=lg(SK.data)||[...FALLBACK];
+  }
+}
+
+async function loadExamJson(set){
+  if(!sb||!set) return;
+  try{
+    const cfg=getCfg();
+    const url=`${cfg.url}/storage/v1/object/public/exam-data/${set.storage_path}`;
+    const r=await fetch(url);
+    if(!r.ok) throw new Error('fetch '+r.status);
+    const d=await r.json();
+    DATA=d; ls(SK.data,d); activeSetId=set.id;
+  }catch(e){
+    console.warn('JSON fetch fail, fallback',e);
+    DATA=lg(SK.data)||[...FALLBACK];
+  }
+}
+
+async function saveSessionRemote(sess){
+  if(!sb||!me){ syncSt='offline'; updSync(); return }
+  syncSt='busy'; updSync();
+  try{
+    const setId=activeSetId||examSets[0]?.id||null;
+    await sb.from('sessions').insert({
+      user_id:me.id, exam_set_id:setId,
+      subject:sess.subject, year:DATA[0]?.year||2025,
+      score:sess.score, correct:sess.total-(sess.wrongCount||0),
+      total:sess.total||0, passed:sess.passed,
+      elapsed:sess.elapsed||0,
+      wrong_count:sess.wrongCount||0, flag_count:sess.flagCount||0,
+      subj_scores:sess.subjScores||{},
+      wrong_items:sess.wrongItems||[], flag_items:sess.flagItems||[],
+      memos:sess.memos||{}, device_type:deviceType(),
+    });
+    syncSt='ok'; updSync();
+  }catch(e){
+    console.warn('saveSession fail',e);
+    syncSt=navigator.onLine?'err':'offline'; updSync();
+  }
+}
+
+// 메모 저장 (debounce 500ms)
+function saveMemoDebounced(q, content){
+  // 로컬 즉시 저장
+  const memos=getLocalMemos();
+  const key=qKey(q);
+  memos[key]=content;
+  saveLocalMemos(memos);
+  // UI 표시
+  const el=$('memo-sync');
+  if(el){ el.classList.add('show'); }
+  // DB 저장 debounce
+  clearTimeout(memoTimer);
+  memoTimer=setTimeout(()=>saveMemoRemote(q,content),600);
+}
+
+async function saveMemoRemote(q, content){
+  if(!sb||!me) return;
+  try{
+    const key=qKey(q);
+    await sb.from('memos').upsert({
+      user_id:me.id,
+      question_key:key,
+      content:content,
+      updated_at:new Date().toISOString()
+    },{onConflict:'user_id,question_key'});
+    const el=$('memo-sync');
+    if(el) setTimeout(()=>el.classList.remove('show'),1500);
+  }catch(e){ console.warn('memo save fail',e) }
+}
+
+async function saveCfgRemote(c){
+  if(!sb||!me) return;
+  await sb.from('user_settings').upsert({
+    user_id:me.id, min_subject:c.minSub, min_total:c.minTotal,
+    updated_at:new Date().toISOString()
+  },{onConflict:'user_id'}).catch(()=>{});
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════════════════════════ */
+function render(){
+  $('root').innerHTML = (()=>{
+    switch(screen){
+      case 'auth':     return authScreen();
+      case 'home':     return homeScreen();
+      case 'exam':     return examScreen();
+      case 'result':   return resultScreen();
+      case 'review':   return reviewScreen();
+      case 'history':  return histScreen();
+      case 'settings': return settingsScreen();
+      default: return '';
+    }
+  })();
+  bindAll();
+  if(screen==='exam') startTimer();
+}
+
+function topbar(active){
+  const tabs=[{k:'home',l:'홈'},{k:'history',l:'기록'},{k:'settings',l:'설정'}];
+  const btabs=[{k:'home',ic:'🏠',l:'홈'},{k:'history',ic:'📋',l:'기록'},{k:'settings',ic:'⚙️',l:'설정'}];
+  const emailShort=(me?.email||'').split('@')[0] ||
+    (me?.user_metadata?.full_name||'').split(' ')[0] || '사용자';
+  return `
+  <div class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="logo"><div class="logo-dot"></div>간호직 기출</div>
+      <nav class="topbar-nav">
+        ${tabs.map(t=>`<button class="tnav${active===t.k?' active':''}" data-screen="${t.k}">${t.l}</button>`).join('')}
+        <span id="sync-el" style="margin-left:4px">${syncChip()}</span>
+      </nav>
+      ${me?`<div class="user-pill" id="user-pill"><div class="up-dot"></div><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px">${esc(emailShort)}</span></div>`:''}
+    </div>
+  </div>
+  <div class="bot-nav">
+    <div class="bot-nav-in">
+      ${btabs.map(t=>`<button class="bnav${active===t.k?' active':''}" data-screen="${t.k}"><span class="bnav-ic">${t.ic}</span>${t.l}</button>`).join('')}
+    </div>
+  </div>`;
+}
+
+/* ── AUTH ────────────────────────────────────────── */
+function authScreen(){
+  const cfg=getCfg(); const hasConn=!!(cfg.url&&cfg.key);
+  return `
+  <div class="auth-bg">
+    <div class="auth-card">
+      <div class="auth-logo"><div class="auth-logo-dot"></div>간호직 기출문제</div>
+      <div class="auth-h">시작하기</div>
+      <div class="auth-sub">로그인하면 PC·모바일·태블릿에서<br>응시 기록과 메모가 자동 동기화됩니다</div>
+
+      <!-- 소셜 로그인 -->
+      ${hasConn ? `
+      <div class="social-btns">
+        <button class="btn-social btn-google" id="login-google">
+          <svg class="social-icon" viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Google로 로그인
+        </button>
+        <button class="btn-social btn-kakao" id="login-kakao">
+          <svg class="social-icon" viewBox="0 0 24 24" fill="#191919">
+            <path d="M12 3C6.477 3 2 6.477 2 10.8c0 2.725 1.674 5.117 4.2 6.558L5.1 21l4.95-2.7c.627.09 1.27.137 1.95.137 5.523 0 10-3.477 10-7.637C22 6.477 17.523 3 12 3z"/>
+          </svg>
+          카카오로 로그인
+        </button>
+      </div>
+
+      <div class="or-divider">또는 이메일로</div>
+      ` : ''}
+
+      <div class="tab-row">
+        <button class="tab-btn on" data-atab="login">로그인</button>
+        <button class="tab-btn" data-atab="signup">회원가입</button>
+      </div>
+      <div id="a-err" class="alert alert-err"></div>
+      <div id="a-ok"  class="alert alert-ok"></div>
+      <div class="field"><label>이메일</label><input type="email" id="a-email" placeholder="exam@email.com" autocomplete="email"></div>
+      <div class="field"><label>비밀번호</label><input type="password" id="a-pw" placeholder="최소 6자리" autocomplete="current-password"></div>
+      <button class="btn btn-primary btn-full" id="a-submit" data-mode="login">로그인</button>
+
+      <div class="auth-divider"></div>
+      <button class="btn btn-outline btn-full btn-sm" id="a-offline">🔌 오프라인으로 계속하기</button>
+      <button class="btn btn-outline btn-full btn-sm mt8" data-screen="settings" style="margin-top:8px">⚙️ Supabase 연결 설정</button>
+
+      ${!hasConn?`<div class="auth-note">⚠️ Supabase가 연결되지 않았어요.<br>위 버튼에서 연결 정보를 입력하면<br>소셜 로그인과 동기화를 사용할 수 있어요.</div>`:''}
+    </div>
+  </div>`;
+}
+
+/* ── HOME ────────────────────────────────────────── */
+function homeScreen(){
+  const sessions=getSess();
+  const subjects=[...new Set(DATA.map(q=>q.subject))];
+  const year=DATA[0]?.year||2025;
+  const lastFor=sub=>{ const a=sessions.filter(s=>s.subject===sub); return a.length?a[a.length-1]:null };
+
+  // 로그인 방식 표시
+  const provider = me?.app_metadata?.provider||'email';
+  const providerChip = provider==='google'
+    ? `<span class="provider-badge pb-google">G Google</span>`
+    : provider==='kakao'
+    ? `<span class="provider-badge pb-kakao">K 카카오</span>`
+    : `<span class="provider-badge pb-email">✉ 이메일</span>`;
+
+  const cachedSets=examSets.length?examSets:(lg(SK.sets)||[]);
+  const setSelector=cachedSets.length>1?`
+  <div class="set-select-wrap">
+    <select class="set-select" id="set-select">
+      ${cachedSets.map(s=>`<option value="${s.id}" ${s.id===activeSetId?'selected':''}>${s.title} (${s.question_count}문항)</option>`).join('')}
+    </select>
+  </div>`:``
+
+  const sCards=subjects.map(sub=>{
+    const qs=DATA.filter(q=>q.subject===sub); const last=lastFor(sub);
+    const lastLine=last?`<span>최근 <b style="color:${last.passed?'var(--tl)':'var(--rs)'}">${last.score}점</b></span>`:`<span>미응시</span>`;
+    return `<div class="mcard" data-start="${esc(sub)}"><span class="badge ${subBadge(sub)}">${esc(sub)}</span><div class="mcard-count">${qs.length}<sup> 문항</sup></div><div class="mcard-label">${esc(sub)}</div><div class="mcard-meta c-mu fs13">${lastLine}</div></div>`;
+  }).join('');
+
+  const allLast=lastFor('전과목');
+  const allBadges=subjects.map(s=>`<span class="badge ${subBadge(s)}" style="font-size:10px">${esc(s.slice(0,2))}</span>`).join('');
+  const allMeta=allLast?`<span>최근 <b style="color:${allLast.passed?'var(--tl)':'var(--rs)'}">${allLast.score}점</b></span>`:`<span class="c-mu fs13">미응시</span>`;
+  const allCard=`<div class="mcard wide" data-start="전과목"><div style="display:flex;flex-direction:column;gap:8px"><span class="badge b-all">전과목</span><div class="mcard-count">${DATA.length}<sup> 문항</sup></div></div><div style="display:flex;flex-direction:column;gap:8px;flex:1"><div class="mcard-label">전과목 모의고사</div><div style="display:flex;gap:5px;flex-wrap:wrap">${allBadges}</div></div><div class="mcard-meta c-mu fs13">${allMeta}</div></div>`;
+
+  const recent=[...sessions].reverse().slice(0,5);
+  const recentHTML=recent.length?recent.map(s=>histRow(s)).join(''):`<div class="empty"><span class="empty-icon">📭</span>아직 응시 기록이 없어요</div>`;
+
+  return `
+  ${topbar('home')}
+  <div class="page"><div class="wrap">
+    <div class="hero">
+      <span class="hero-eyebrow">${year} · 지방직 9급 공개경쟁임용</span>
+      <h1 class="hero-title">간호직 기출문제</h1>
+      <p class="hero-sub">국어 · 영어 · 지역사회간호 · 간호관리 — 총 ${DATA.length}문항</p>
+      <div class="user-bar">
+        <div class="up-dot" style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${sb&&me?'var(--tl)':'var(--dm)'}"></div>
+        <span class="user-bar-email">${me?.email||me?.user_metadata?.full_name||'오프라인 모드'}</span>
+        ${me?providerChip:''}
+        <span id="sync-el">${syncChip()}</span>
+        <button class="btn btn-outline btn-sm" id="refresh-btn" title="동기화">↻</button>
+      </div>
+    </div>
+    <div class="sec-head sec-gap">시험 선택</div>
+    ${setSelector}
+    <div class="mode-grid">${allCard}${sCards}</div>
+    <div class="divider"></div>
+    <div class="flex ai-c gap8 mt8" style="margin-bottom:12px">
+      <div class="sec-head" style="margin-bottom:0">최근 응시</div>
+      ${sessions.length>5?`<button class="btn btn-outline btn-sm" data-screen="history" style="margin-left:auto">전체 보기</button>`:''}
+    </div>
+    ${recentHTML}
+  </div></div>`;
+}
+
+/* ── EXAM ────────────────────────────────────────── */
+function examScreen(){
+  if(!exam) return '';
+  const {questions,curIdx,answers,flags,memos,elapsed,finished}=exam;
+  const q=questions[curIdx]; const sel=answers[curIdx]??null;
+  const isFlagged=flags.has(curIdx);
+  const pct=((curIdx+1)/questions.length*100).toFixed(1);
+
+  // 저장된 메모 우선순위: 시험 내 메모 > 로컬 캐시
+  const localMemos=getLocalMemos();
+  const memoContent=memos[curIdx]||localMemos[qKey(q)]||'';
+
+  const optsH=q.options.map((txt,i)=>{
+    const n=i+1; let cls='opt';
+    if(finished){ cls+=' locked'; if(n===q.correct_answer)cls+=' correct'; else if(sel===n)cls+=' wrong'; }
+    else if(sel===n) cls+=' chosen';
+    return `<div class="${cls}" data-pick="${n}"><div class="opt-n">${n}</div><div class="opt-txt">${esc(txt)}</div></div>`;
+  }).join('');
+
+  const dotsH=questions.map((_,i)=>{
+    let cls='qdot'; if(i===curIdx)cls+=' cur'; else if(flags.has(i))cls+=' flg'; else if(answers[i]!==undefined)cls+=' ans';
+    return `<div class="${cls}" data-jump="${i}">${i+1}</div>`;
+  }).join('');
+
+  const unanswered=questions.length-Object.keys(answers).length;
+  const actionBtns=`
+    <button class="flag-btn${isFlagged?' on':''}" id="flag-btn">${isFlagged?'🚩 해제':'⚑ 플래그'}</button>
+    <div class="sp"></div>
+    ${curIdx>0?`<button class="btn btn-outline btn-sm" id="prev-btn">← 이전</button>`:''}
+    ${curIdx<questions.length-1
+      ?`<button class="btn btn-primary btn-sm" id="next-btn">다음 →</button>`
+      :finished
+        ?`<button class="btn btn-primary btn-sm" id="result-btn">결과 보기 →</button>`
+        :`<button class="btn btn-primary btn-sm" id="submit-btn">제출${unanswered>0?` <span style="opacity:.6;font-size:11px">(${unanswered})</span>`:' ✓'}</button>`}`;
+
+  return `
+  ${topbar('exam')}
+  <div class="page"><div class="wrap">
+    <div class="exam-header">
+      <span class="exam-ctr">${curIdx+1} / ${questions.length}</span>
+      <div class="prog"><div class="prog-fill" style="width:${pct}%"></div></div>
+      <div class="timer" id="timer-el">${hms(elapsed)}</div>
+    </div>
+    <div class="exam-layout">
+      <div class="exam-main">
+        <div class="qcard">
+          <div class="qhead"><span class="badge ${subBadge(q.subject)}">${esc(q.subject)}</span><span class="qnum mono">No.${q.number}</span></div>
+          <div class="qbody">${esc(q.content)}</div>
+          <div class="opts">${optsH}</div>
+        </div>
+        <div class="act-bar">${actionBtns}</div>
+        <div class="memo-box">
+          <div class="memo-lbl">
+            📝 메모
+            <span id="memo-sync" class="memo-sync">✓ 저장됨</span>
+          </div>
+          <textarea class="memo-ta" id="memo-ta"
+            placeholder="틀린 이유나 개념을 메모해두세요...">${esc(memoContent)}</textarea>
+        </div>
+        <div class="hide-mob">
+          <div class="nav-lbl">문항 네비게이터</div>
+          <div class="qdots">${dotsH}</div>
+        </div>
+        ${finished?`<div class="mt20"><button class="btn btn-primary btn-full" id="result-btn2">결과 보기 →</button></div>`:''}
+      </div>
+      <div class="exam-sidebar">
+        <div class="exam-sb-title">문항 네비게이터</div>
+        <div class="qdots">${dotsH}</div>
+        ${finished?`<div class="mt12"><button class="btn btn-primary btn-full btn-sm" id="result-btn3">결과 보기</button></div>`:''}
+      </div>
+    </div>
+  </div></div>
+  <div class="exam-bot">
+    <div class="exam-bot-in">${actionBtns}</div>
+  </div>`;
+}
+
+function startTimer(){
+  clearTimer();
+  timer=setInterval(()=>{
+    if(!exam||exam.finished) return;
+    exam.elapsed++;
+    const t=$('timer-el'); if(t) t.textContent=hms(exam.elapsed);
+  },1000);
+}
+
+/* ── RESULT ──────────────────────────────────────── */
+function resultScreen(){
+  if(!result) return '';
+  const r=result; const pass=r.passed;
+  const subjRows=Object.entries(r.subjScores).map(([sub,d])=>{
+    const c=subColor(sub);
+    return `<div class="subj-row"><div class="subj-name">${esc(sub)}</div><div class="bar-wrap"><div class="bar-fill" style="width:${d.score}%;background:${c}"></div></div><div class="subj-score" style="color:${c}">${d.score}<small class="c-mu" style="font-size:11px">점</small></div><span class="pc ${d.pass?'pass':'fail'}">${d.pass?'PASS':'FAIL'}</span></div>`;
+  }).join('');
+  const rCnt=r.wrongItems.length+r.flagItems.length;
+  return `
+  ${topbar('result')}
+  <div class="page"><div class="wrap">
+    <div class="res-hero">
+      <div class="res-emoji">${pass?'🎉':'📚'}</div>
+      <div class="res-verdict ${pass?'pass':'fail'}">${pass?'합격':'불합격'}</div>
+      <div class="res-sub">${esc(r.subject)} · ${DATA[0]?.year||2025}년 지방직 9급</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-v" style="color:${pass?'var(--tl)':'var(--rs)'}">${r.totalScore}</div><div class="stat-l">총점</div></div>
+      <div class="stat"><div class="stat-v">${r.correct}<small class="c-mu" style="font-size:14px">/${r.total}</small></div><div class="stat-l">정답</div></div>
+      <div class="stat"><div class="stat-v c-am">${hms(r.elapsed)}</div><div class="stat-l">소요시간</div></div>
+      <div class="stat"><div class="stat-v c-rs">${r.wrongItems.length}</div><div class="stat-l">오답</div></div>
+    </div>
+    <div class="subj-list">${subjRows}</div>
+    <div class="res-note">합격 기준 — 과목당 ${r.settings.minSub}점 · 전체 ${r.settings.minTotal}점 이상</div>
+    <div class="res-btns">
+      ${rCnt>0?`<button class="btn btn-primary flex-1" id="go-review">오답·플래그 리뷰 (${rCnt})</button>`:''}
+      <button class="btn btn-outline flex-1" data-screen="home">홈으로</button>
+    </div>
+  </div></div>`;
+}
+
+/* ── REVIEW ──────────────────────────────────────── */
+function reviewScreen(){
+  const src=reviewSrc||result;
+  if(!src) return `${topbar('review')}<div class="page"><div class="wrap"><div class="empty"><span class="empty-icon">🔍</span>리뷰 데이터가 없습니다</div></div></div>`;
+  const items=[
+    ...(src.wrongItems||[]).map(x=>({...x,type:'wrong'})),
+    ...(src.flagItems||[]).filter(x=>!(src.wrongItems||[]).some(w=>w.i===x.i)).map(x=>({...x,type:'flag'})),
+  ];
+  if(!items.length) return `${topbar('review')}<div class="page"><div class="wrap"><div class="empty"><span class="empty-icon">🎯</span>모두 정답이에요!</div></div></div>`;
+  const localMemos=getLocalMemos();
+  const cards=items.map(({q,i,sel,type,memo})=>{
+    const m=(src.memos||{})[i]||localMemos[qKey(q)]||memo||'';
+    const tag=type==='wrong'?`<span class="rtag rtag-w">오답</span>`:`<span class="rtag rtag-f">🚩 플래그</span>`;
+    const info=sel?`<span class="c-mu fs13">내 답: <b style="color:var(--rs)">${sel}번</b> → 정답: <b style="color:var(--tl)">${q.correct_answer}번</b></span>`:`<span class="c-mu fs13">미응답 → 정답: <b style="color:var(--tl)">${q.correct_answer}번</b></span>`;
+    const opts=q.options.map((txt,oi)=>{
+      const n=oi+1; let cls='ropt'; if(n===q.correct_answer)cls+=' ropt-c'; else if(sel===n)cls+=' ropt-w'; else cls+=' ropt-n';
+      return `<div class="${cls}"><span class="ropt-num">${n}</span>${esc(txt)}</div>`;
+    }).join('');
+    return `<div class="rv-card"><div class="rv-tags">${tag}<span class="badge ${subBadge(q.subject)}">${esc(q.subject)}</span><span class="mono fs13 c-mu">문항 ${q.number}</span>${info}</div><div class="rv-q">${esc(q.content)}</div><div class="rv-opts">${opts}</div>${m?`<div class="rv-memo">📝 ${esc(m)}</div>`:''}</div>`;
+  }).join('');
+  return `
+  ${topbar('review')}
+  <div class="page"><div class="wrap">
+    <div class="pg-head"><div><div class="pg-title">오답·플래그 리뷰</div><div class="pg-sub">${items.length}문제</div></div><div class="sp"></div><button class="btn btn-outline btn-sm" data-screen="home">홈으로</button></div>
+    ${cards}
+  </div></div>`;
+}
+
+/* ── HISTORY ─────────────────────────────────────── */
+function histRow(s){
+  const c=s.passed?'var(--tl)':'var(--rs)';
+  const dev=s.deviceType||'desktop';
+  const devIcon=dev==='mobile'?'📱':dev==='tablet'?'💻':'🖥️';
+  return `<div class="hist-item" data-rid="${esc(s.id)}"><div class="hist-date">${esc(s.date)}</div><div class="hist-info"><div class="hist-subj">${esc(s.subject)}</div><div class="hist-meta">${hms(s.elapsed||0)} · 오답 ${s.wrongCount||0}개 · 플래그 ${s.flagCount||0}개</div></div><span class="hist-dev">${devIcon} ${dev}</span><div class="hist-score" style="color:${c}">${s.score}<small class="c-mu" style="font-size:12px">점</small></div></div>`;
+}
+function histScreen(){
+  const sessions=[...getSess()].reverse();
+  const rows=sessions.length?sessions.map(s=>histRow(s)).join(''):`<div class="empty"><span class="empty-icon">📋</span>응시 기록이 없어요</div>`;
+  return `
+  ${topbar('history')}
+  <div class="page"><div class="wrap">
+    <div class="pg-head"><div><div class="pg-title">응시 기록</div><div class="pg-sub">${sessions.length}회</div></div>${sessions.length?`<button class="btn btn-outline btn-sm" id="clr-hist" style="margin-left:auto;color:var(--rs);border-color:rgba(255,94,122,.4)">삭제</button>`:''}
+    </div>
+    ${rows}
+  </div></div>`;
+}
+
+/* ── SETTINGS ────────────────────────────────────── */
+function settingsScreen(){
+  const uc=getCfgUser(); const cfg=getCfg();
+  const provider=me?.app_metadata?.provider||'email';
+  const providerText=provider==='google'?'Google 계정':provider==='kakao'?'카카오 계정':'이메일';
+  const cachedSets=examSets.length?examSets:(lg(SK.sets)||[]);
+  const setsInfo=cachedSets.length
+    ? cachedSets.map(s=>`<div style="padding:3px 0;font-size:13px;color:var(--mu)">${esc(s.title)} <span class="mono" style="font-size:11px;color:var(--dm)">${esc(s.storage_path)}</span></div>`).join('')
+    : `<span class="fs13 c-mu">내장 데이터 사용 중 (DB 연결 시 자동 로드)</span>`;
+  return `
+  ${topbar('settings')}
+  <div class="page"><div class="wrap">
+    <div class="pg-head"><div class="pg-title">설정</div></div>
+
+    <div class="scard">
+      <div class="scard-title">계정</div>
+      <div class="srow">
+        <div class="srow-info">
+          <div class="srow-lbl">${me?esc(me.email||me.user_metadata?.full_name||'소셜 로그인'):'오프라인 모드'}</div>
+          <div class="srow-desc">${me?providerText+' · '+syncChip():'로그인하면 동기화 가능'}</div>
+        </div>
+        <button class="btn btn-outline btn-sm" id="logout-btn" style="color:var(--rs);border-color:rgba(255,94,122,.4)">${me?'로그아웃':'로그인'}</button>
+      </div>
+    </div>
+
+    <div class="scard">
+      <div class="scard-title">Supabase 연결 (필수)</div>
+      <div class="cfg-body">
+        <div style="font-size:12px;color:var(--mu);line-height:1.6">
+          Google/카카오 소셜 로그인과 동기화를 사용하려면<br>
+          Supabase 프로젝트 URL과 API 키가 필요합니다.<br>
+          <b style="color:var(--am)">SETUP_GUIDE.md</b> 를 참고해 Supabase를 설정하세요.
+        </div>
+        <div class="field" style="margin:0"><label>Project URL</label><input class="txt-in" id="cfg-url" type="url" placeholder="https://xxxx.supabase.co" value="${esc(cfg.url||'')}"></div>
+        <div class="field" style="margin:0"><label>Anon Public Key</label><input class="txt-in" id="cfg-key" type="text" placeholder="eyJhbGci..." value="${esc(cfg.key||'')}"></div>
+        <button class="btn btn-primary btn-full" id="save-cfg">저장 &amp; 재연결</button>
+      </div>
+    </div>
+
+    <div class="scard">
+      <div class="scard-title">합격 기준</div>
+      <div class="srow"><div class="srow-info"><div class="srow-lbl">과목당 최소 점수</div><div class="srow-desc">각 과목별 합격 기준 (100점 만점)</div></div><input class="num-in" type="number" id="s-per" min="0" max="100" value="${uc.minSub}"></div>
+      <div class="srow"><div class="srow-info"><div class="srow-lbl">전체 합격 최소 점수</div><div class="srow-desc">전 과목 기준 (100점 만점)</div></div><input class="num-in" type="number" id="s-total" min="0" max="100" value="${uc.minTotal}"></div>
+    </div>
+    <button class="btn btn-primary btn-full" id="save-cfg-user" style="margin-bottom:12px">합격 기준 저장</button>
+
+    <div class="scard">
+      <div class="scard-title">시험 회차</div>
+      <div class="srow" style="flex-direction:column;align-items:flex-start;gap:4px">
+        ${setsInfo}
+        <div class="srow-desc mt8">새 회차: Storage › exam-data 버킷에 JSON 업로드 후 exam_sets INSERT</div>
+      </div>
+    </div>
+
+    <div class="scard">
+      <div class="scard-title">데이터</div>
+      <div class="srow"><div class="srow-info"><div class="srow-lbl">현재 문항</div><div class="srow-desc">${[...new Set(DATA.map(q=>q.subject))].join(' · ')}</div></div><span class="mono fw7 c-bl">${DATA.length}</span></div>
+      <div class="srow"><div class="srow-info"><div class="srow-lbl">로컬 초기화</div><div class="srow-desc">모든 로컬 기록·설정 삭제</div></div><button class="btn btn-outline btn-sm" id="reset-all" style="color:var(--rs);border-color:rgba(255,94,122,.4)">초기화</button></div>
+    </div>
+  </div></div>`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   EXAM LOGIC
+══════════════════════════════════════════════════════════════ */
+function startExam(subject){
+  const qs=subject==='전과목'?[...DATA]:DATA.filter(q=>q.subject===subject);
+  exam={subject,questions:qs,curIdx:0,answers:{},flags:new Set(),memos:{},elapsed:0,finished:false};
+  goto('exam');
+}
+
+function finishExam(){
+  if(!exam) return;
+  clearTimer(); exam.finished=true;
+  const {questions,answers,flags,memos,subject,elapsed}=exam;
+  const settings=getCfgUser();
+  const sm={};
+  questions.forEach((q,i)=>{
+    if(!sm[q.subject]) sm[q.subject]={total:0,correct:0};
+    sm[q.subject].total++;
+    if((answers[i]??null)===q.correct_answer) sm[q.subject].correct++;
+  });
+  const ss={}; let totalC=0;
+  Object.entries(sm).forEach(([sub,d])=>{
+    const sc=Math.round(d.correct/d.total*100);
+    ss[sub]={score:sc,correct:d.correct,total:d.total,pass:sc>=settings.minSub};
+    totalC+=d.correct;
+  });
+  const totalScore=Math.round(totalC/questions.length*100);
+  const passed=Object.values(ss).every(s=>s.pass)&&totalScore>=settings.minTotal;
+  const wrongItems=[],flagItems=[];
+  questions.forEach((q,i)=>{
+    const ok=(answers[i]??null)===q.correct_answer;
+    const item={q,i,sel:answers[i]??null,isCorrect:ok,memo:memos[i]||''};
+    if(!ok) wrongItems.push(item);
+    if(flags.has(i)&&ok) flagItems.push(item);
+  });
+  result={subject,elapsed,totalScore,correct:totalC,total:questions.length,passed,subjScores:ss,wrongItems,flagItems,settings,memos};
+  const sess={
+    id:String(Date.now()),date:todayStr(),subject,
+    score:totalScore,passed,elapsed,total:questions.length,
+    wrongCount:wrongItems.length,flagCount:[...flags].size,
+    wrongItems,flagItems,subjScores:ss,memos,deviceType:deviceType(),
+  };
+  const all=getSess(); all.push(sess); saveSess(all);
+  saveSessionRemote(sess);
+  goto('result');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   EVENTS
+══════════════════════════════════════════════════════════════ */
+function bindAll(){
+  $('root').addEventListener('click', onClick);
+
+  // 메모 입력 → debounce 저장
+  const mta=$('memo-ta');
+  if(mta) mta.addEventListener('input',e=>{
+    const content=e.target.value;
+    if(exam){
+      exam.memos[exam.curIdx]=content;
+      saveMemoDebounced(exam.questions[exam.curIdx], content);
+    }
+  });
+
+  // 엔터키
+  const aPw=$('a-pw');
+  if(aPw) aPw.addEventListener('keydown',e=>{ if(e.key==='Enter') $('a-submit')?.click() });
+  const aEmail=$('a-email');
+  if(aEmail) aEmail.addEventListener('keydown',e=>{ if(e.key==='Enter') $('a-pw')?.focus() });
+
+  // auth 탭 전환
+  document.querySelectorAll('[data-atab]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const t=btn.dataset.atab;
+      document.querySelectorAll('[data-atab]').forEach(b=>b.classList.toggle('on',b.dataset.atab===t));
+      const sub=$('a-submit');
+      if(sub){ sub.textContent=t==='login'?'로그인':'회원가입'; sub.dataset.mode=t }
+    });
+  });
+
+  // exam-set 변경
+  const sel=$('set-select');
+  if(sel) sel.addEventListener('change',async e=>{
+    const set=(lg(SK.sets)||[]).find(s=>s.id===e.target.value);
+    if(set){ await loadExamJson(set); render() }
+  });
+}
+
+function onClick(e){
+  const el=e.target.closest('[data-screen],[data-start],[data-pick],[data-jump],[data-rid],[id]');
+  if(!el) return;
+
+  if(el.dataset.screen){ goto(el.dataset.screen); return }
+  if(el.dataset.start){ startExam(el.dataset.start); return }
+  if(el.dataset.rid){
+    const s=getSess().find(s=>s.id===el.dataset.rid);
+    if(s){ reviewSrc=s; goto('review') } return;
+  }
+  if(el.dataset.pick&&exam&&!exam.finished){
+    exam.answers[exam.curIdx]=parseInt(el.dataset.pick); render(); return;
+  }
+  if(el.dataset.jump&&exam){ exam.curIdx=parseInt(el.dataset.jump); render(); return }
+
+  const id=el.id;
+  if(id==='prev-btn'&&exam){ exam.curIdx--; render(); return }
+  if(id==='next-btn'&&exam){ exam.curIdx++; render(); return }
+  if(id==='flag-btn'&&exam){
+    const ci=exam.curIdx; exam.flags.has(ci)?exam.flags.delete(ci):exam.flags.add(ci); render(); return;
+  }
+  if(id==='submit-btn'&&exam){
+    const u=exam.questions.length-Object.keys(exam.answers).length;
+    if(u>0&&!confirm(`${u}개 미답 문항이 있습니다.\n제출하시겠습니까?`)) return;
+    finishExam(); return;
+  }
+  if((id==='result-btn'||id==='result-btn2'||id==='result-btn3')&&exam?.finished){ goto('result'); return }
+  if(id==='go-review'){ reviewSrc=null; goto('review'); return }
+  if(id==='clr-hist'){
+    if(confirm('모든 기록을 삭제할까요?')){ saveSess([]); toast('삭제됐어요'); render() } return;
+  }
+  if(id==='save-cfg-user'){
+    const c={minSub:parseInt($('s-per')?.value)||40, minTotal:parseInt($('s-total')?.value)||60};
+    saveCfgUser(c); saveCfgRemote(c); toast('저장됐어요 ✓'); return;
+  }
+  if(id==='reset-all'){
+    if(confirm('모든 로컬 데이터를 초기화할까요?\n되돌릴 수 없어요.')){
+      localStorage.clear(); toast('초기화 완료'); goto('auth')
+    } return;
+  }
+  if(id==='logout-btn'){ if(me){ if(confirm('로그아웃할까요?')) signOut() } else goto('auth'); return }
+  if(id==='user-pill'){ goto('settings'); return }
+  if(id==='refresh-btn'){ loadRemote().then(render); return }
+  if(id==='a-offline'){ me=null; goto('home'); return }
+
+  if(id==='save-cfg'){
+    const url=($('cfg-url')?.value||'').trim();
+    const key=($('cfg-key')?.value||'').trim();
+    if(!url||!key){ toast('URL과 키를 모두 입력해주세요'); return }
+    saveCfg({url, key}); initSB(); toast('저장됐어요. 다시 로그인해주세요.');
+    setTimeout(()=>goto('auth'),700); return;
+  }
+
+  // 소셜 로그인
+  if(id==='login-google'){
+    signInWithGoogle().catch(err=>{ toast('Google 로그인 실패: '+err.message) }); return;
+  }
+  if(id==='login-kakao'){
+    signInWithKakao().catch(err=>{ toast('카카오 로그인 실패: '+err.message) }); return;
+  }
+
+  // 이메일 로그인/가입
+  if(id==='a-submit'){
+    const mode=el.dataset.mode||'login';
+    const email=($('a-email')?.value||'').trim();
+    const pw=$('a-pw')?.value||'';
+    const errEl=$('a-err'); const okEl=$('a-ok');
+    errEl.classList.remove('show'); okEl.classList.remove('show');
+    if(!email||!pw){ errEl.textContent='이메일과 비밀번호를 입력해주세요'; errEl.classList.add('show'); return }
+    if(!sb){ errEl.textContent='Supabase 연결 정보를 먼저 설정해주세요'; errEl.classList.add('show'); return }
+    el.classList.add('btn-spin'); el.disabled=true;
+    (mode==='login'?signIn(email,pw):signUp(email,pw))
+      .then(async()=>{
+        if(mode==='signup'){
+          okEl.textContent='가입 완료! 이메일 인증 후 로그인해주세요.';
+          okEl.classList.add('show'); el.classList.remove('btn-spin'); el.disabled=false;
+        } else { await loadRemote(); goto('home') }
+      })
+      .catch(err=>{
+        errEl.textContent=err.message||'실패했습니다'; errEl.classList.add('show');
+        el.classList.remove('btn-spin'); el.disabled=false;
+      });
+    return;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════════════════════════ */
+async function boot(){
+  DATA = lg(SK.data)||[...FALLBACK];
+  const cached=lg(SK.sets); if(cached) examSets=cached;
+
+  initSB();
+
+  if(sb){
+    // 소셜 로그인 콜백 처리 (URL hash에 토큰이 있는 경우)
+    const isCallback = await handleAuthCallback();
+    if(isCallback){
+      await loadRemote(); goto('home'); return;
+    }
+    // 기존 세션 복원
+    const ok = await checkSession();
+    if(ok){ await loadRemote(); goto('home'); return }
+  }
+  goto('auth');
+}
+
+window.addEventListener('online',  ()=>{ syncSt='idle'; updSync(); if(sb&&me) loadRemote() });
+window.addEventListener('offline', ()=>{ syncSt='offline'; updSync() });
+boot();
+</script>
+</body>
+</html>
