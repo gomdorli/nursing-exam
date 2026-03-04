@@ -226,6 +226,59 @@ textarea{resize:none}
 .rv-card-fold.open .rv-fold-arrow{transform:rotate(90deg);color:var(--mu)}
 .rv-fold-body{padding-top:14px}
 
+/* ══ BANK CARD (홈) ════════════════════════════════ */
+.bank-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:4px}
+.bank-card{background:linear-gradient(135deg,rgba(61,127,255,.07),rgba(123,92,255,.05));border:1px solid rgba(61,127,255,.2);border-radius:var(--r16);padding:16px 18px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden}
+.bank-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(61,127,255,.1),transparent);opacity:0;transition:opacity .18s}
+.bank-card:hover{border-color:var(--bl);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.bank-card:hover::after{opacity:1}
+.bank-card-top{display:flex;align-items:center;justify-content:space-between}
+.bank-count{font-family:var(--mn);font-size:22px;font-weight:700;color:var(--bl2);line-height:1}
+.bank-years{display:flex;gap:4px;flex-wrap:wrap}
+.bank-year-chip{font-family:var(--mn);font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(61,127,255,.12);color:var(--bl2);border:1px solid rgba(61,127,255,.2)}
+.bank-label{font-size:11px;color:var(--mu)}
+.bank-mini-badge{font-size:10px;padding:2px 7px;border-radius:20px;background:rgba(61,127,255,.1);color:var(--bl2);border:1px solid rgba(61,127,255,.2);font-family:var(--mn)}
+
+/* ══ BANK MODAL ════════════════════════════════════ */
+.bank-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
+.bank-modal{background:var(--sf);border:1px solid var(--bd2);border-radius:var(--r16);width:100%;max-width:460px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.7)}
+.bank-modal-hd{padding:18px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;justify-content:space-between;background:var(--sf2)}
+.bank-modal-title{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.bank-modal-sub{font-size:12px;color:var(--mu);margin-top:3px}
+.bank-close{background:var(--sf3);border:1px solid var(--bd);color:var(--mu);width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.bank-close:hover{color:var(--tx);border-color:var(--bd2)}
+.bank-modal-bd{padding:18px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:18px;flex:1}
+.bank-modal-ft{padding:14px 20px;border-top:1px solid var(--bd);display:flex;gap:10px;background:var(--sf2)}
+
+.bm-section{display:flex;flex-direction:column;gap:8px}
+.bm-label{font-size:11px;font-weight:700;color:var(--mu);letter-spacing:.5px;text-transform:uppercase}
+.bm-subject-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.bm-subj-btn{padding:10px 14px;border-radius:var(--r8);border:1.5px solid var(--bd2);background:var(--sf2);color:var(--mu);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;text-align:left}
+.bm-subj-btn:hover{border-color:var(--bd3);color:var(--tx)}
+.bm-subj-btn.on{background:rgba(61,127,255,.12);border-color:var(--bl);color:var(--bl2)}
+.bm-year-row{display:flex;gap:7px;flex-wrap:wrap}
+.bm-year-btn{padding:6px 14px;border-radius:20px;border:1.5px solid var(--bd2);background:var(--sf2);color:var(--mu);font-size:12px;font-family:var(--mn);cursor:pointer;transition:all .15s}
+.bm-year-btn:hover{border-color:var(--bd3);color:var(--tx)}
+.bm-year-btn.on{background:rgba(61,127,255,.12);border-color:var(--bl);color:var(--bl2)}
+
+.bm-slider{width:100%;appearance:none;height:4px;border-radius:2px;background:var(--sf3);outline:none;cursor:pointer}
+.bm-slider::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:var(--bl);border:3px solid var(--bg);cursor:pointer;box-shadow:0 2px 8px rgba(61,127,255,.4)}
+.bm-slider-hints{display:flex;align-items:center;justify-content:space-between;font-family:var(--mn);font-size:11px;color:var(--dm);margin-top:4px}
+.bm-quick-btns{display:flex;gap:5px}
+.bm-quick{padding:3px 10px;border-radius:20px;border:1px solid var(--bd2);background:var(--sf2);color:var(--mu);font-size:11px;font-family:var(--mn);cursor:pointer;transition:all .15s}
+.bm-quick:hover{border-color:var(--bl);color:var(--bl2)}
+
+.bm-opt-row{display:flex;flex-direction:column;gap:8px}
+.bm-toggle{display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 12px;border-radius:var(--r8);border:1px solid var(--bd);background:var(--sf2)}
+.bm-toggle input{display:none}
+.bm-toggle-track{width:32px;height:18px;border-radius:9px;background:var(--dm);position:relative;transition:background .2s;flex-shrink:0}
+.bm-toggle-track::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:2px;left:2px;transition:transform .2s}
+.bm-toggle input:checked ~ .bm-toggle-track{background:var(--bl)}
+.bm-toggle input:checked ~ .bm-toggle-track::after{transform:translateX(14px)}
+.bm-toggle-label{font-size:13px;color:var(--tx)}
+
+.bm-info{background:rgba(61,127,255,.06);border:1px solid rgba(61,127,255,.15);border-radius:var(--r8);padding:10px 13px;font-size:12px;color:var(--bl2)}
+
 /* ══ HISTORY ════════════════════════════════════════ */
 .hist-item{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r16);padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s;margin-bottom:8px}
 .hist-item:hover{border-color:var(--bd2);transform:translateX(2px)}
@@ -331,6 +384,80 @@ textarea{resize:none}
 </head>
 <body>
 <div id="root"></div>
+
+<!-- 문제 은행 모달 -->
+<div id="bank-modal" class="bank-modal-bg" style="display:none" onclick="if(event.target===this)closeBankModal()">
+  <div class="bank-modal">
+    <div class="bank-modal-hd">
+      <div>
+        <div class="bank-modal-title">🏦 문제 은행</div>
+        <div class="bank-modal-sub" id="bm-sub-label">과목 · 전 회차 랜덤 출제</div>
+      </div>
+      <button class="bank-close" onclick="closeBankModal()">✕</button>
+    </div>
+
+    <div class="bank-modal-bd">
+      <!-- 과목 선택 -->
+      <div class="bm-section">
+        <div class="bm-label">과목 선택</div>
+        <div class="bm-subject-grid" id="bm-subjects"></div>
+      </div>
+
+      <!-- 회차 필터 -->
+      <div class="bm-section">
+        <div class="bm-label">회차 <span style="color:var(--mu);font-weight:400">— 복수 선택 가능</span></div>
+        <div class="bm-year-row" id="bm-years"></div>
+      </div>
+
+      <!-- 문제 수 슬라이더 -->
+      <div class="bm-section">
+        <div class="bm-label" style="display:flex;justify-content:space-between">
+          문제 수
+          <span>
+            <b id="bm-cnt-val" style="color:var(--bl2);font-size:16px">10</b>
+            <span style="color:var(--mu);font-size:12px"> / </span>
+            <span id="bm-cnt-max" style="color:var(--mu);font-size:12px">0</span>문항
+          </span>
+        </div>
+        <input type="range" id="bm-slider" min="1" max="1" value="10" class="bm-slider">
+        <div class="bm-slider-hints">
+          <span>1</span>
+          <div class="bm-quick-btns">
+            <button class="bm-quick" onclick="setBmCount(10)">10</button>
+            <button class="bm-quick" onclick="setBmCount(20)">20</button>
+            <button class="bm-quick" onclick="setBmCount(40)">40</button>
+            <button class="bm-quick" onclick="setBmQuickMax()">전체</button>
+          </div>
+          <span id="bm-slider-max-lbl">0</span>
+        </div>
+      </div>
+
+      <!-- 옵션 -->
+      <div class="bm-section">
+        <div class="bm-label">출제 옵션</div>
+        <div class="bm-opt-row">
+          <label class="bm-toggle">
+            <input type="checkbox" id="bm-shuffle-opts" checked>
+            <span class="bm-toggle-track"></span>
+            <span class="bm-toggle-label">보기 순서 섞기</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 가능 문항 미리보기 -->
+      <div class="bm-info" id="bm-info">
+        <span id="bm-info-txt">과목과 회차를 선택하면 출제 가능 문항 수가 표시돼요</span>
+      </div>
+    </div>
+
+    <div class="bank-modal-ft">
+      <button class="btn btn-outline" onclick="closeBankModal()">취소</button>
+      <button class="btn btn-primary" id="bm-start" onclick="startBankExam()" style="max-width:200px" disabled>
+        시작하기
+      </button>
+    </div>
+  </div>
+</div>
 <div id="toast"></div>
 <script>
 /* ══════════════════════════════════════════════════════════════
@@ -354,6 +481,7 @@ let sb = null;
 let me = null;
 let screen = 'auth';
 let DATA = [...FALLBACK];
+let ALL_DATA = [];          // 전 회차 통합 문제 풀
 let examSets = [];
 let activeSetId = null;
 let exam = null;
@@ -371,7 +499,8 @@ const SK = {
   cfg:      'nx_user_cfg_v1',
   data:     'nx_exam_data_v2',
   sets:     'nx_exam_sets_v1',
-  memos:    'nx_memos_v1',     // 로컬 메모 캐시 { questionKey: content }
+  memos:    'nx_memos_v1',
+  allData:  'nx_all_data_v1',   // 전 회차 통합 풀
 };
 const lg  = k => { try{return JSON.parse(localStorage.getItem(k))||null}catch{return null} };
 const ls  = (k,v) => localStorage.setItem(k, JSON.stringify(v));
@@ -514,7 +643,12 @@ async function loadRemote(){
       .eq('is_active',true).order('year',{ascending:false});
     if(sets?.length){
       examSets=sets; ls(SK.sets, sets);
+      // 현재 선택 회차 로드
       await loadExamJson(sets[0]);
+      // 전 회차 JSON 병렬 로드 → ALL_DATA 구성
+      const allArrays = await Promise.all(sets.map(s => fetchExamJson(s)));
+      ALL_DATA = allArrays.flat();
+      ls(SK.allData, ALL_DATA);
     }
 
     syncSt='ok'; updSync();
@@ -523,22 +657,27 @@ async function loadRemote(){
     syncSt=navigator.onLine?'err':'offline'; updSync();
     const cached=lg(SK.sets); if(cached) examSets=cached;
     DATA=lg(SK.data)||[...FALLBACK];
+    ALL_DATA=lg(SK.allData)||[...FALLBACK];
   }
 }
 
 async function loadExamJson(set){
   if(!sb||!set) return;
   try{
-    const cfg=getCfg();
-    const url=`${cfg.url}/storage/v1/object/public/exam-data/${set.storage_path}`;
-    const r=await fetch(url);
-    if(!r.ok) throw new Error('fetch '+r.status);
-    const d=await r.json();
+    const d = await fetchExamJson(set);
     DATA=d; ls(SK.data,d); activeSetId=set.id;
   }catch(e){
     console.warn('JSON fetch fail, fallback',e);
     DATA=lg(SK.data)||[...FALLBACK];
   }
+}
+
+async function fetchExamJson(set){
+  const cfg=getCfg();
+  const url=`${cfg.url}/storage/v1/object/public/exam-data/${set.storage_path}`;
+  const r=await fetch(url);
+  if(!r.ok) throw new Error('fetch '+r.status);
+  return await r.json();
 }
 
 async function saveSessionRemote(sess){
@@ -699,17 +838,28 @@ function homeScreen(){
     : `<span class="provider-badge pb-email">✉ 이메일</span>`;
 
   const cachedSets=examSets.length?examSets:(lg(SK.sets)||[]);
-  const setSelector=cachedSets.length>1?`
+  const setSelector=cachedSets.length>0?`
   <div class="set-select-wrap">
     <select class="set-select" id="set-select">
-      ${cachedSets.map(s=>`<option value="${s.id}" ${s.id===activeSetId?'selected':''}>${s.title} (${s.question_count}문항)</option>`).join('')}
+      ${cachedSets.map(s=>`<option value="${String(s.id)}" ${String(s.id)===String(activeSetId)?'selected':''}>${s.title} (${s.question_count}문항)</option>`).join('')}
     </select>
   </div>`:``
 
   const sCards=subjects.map(sub=>{
     const qs=DATA.filter(q=>q.subject===sub); const last=lastFor(sub);
     const lastLine=last?`<span>최근 <b style="color:${last.passed?'var(--tl)':'var(--rs)'}">${last.score}점</b></span>`:`<span>미응시</span>`;
-    return `<div class="mcard" data-start="${esc(sub)}"><span class="badge ${subBadge(sub)}">${esc(sub)}</span><div class="mcard-count">${qs.length}<sup> 문항</sup></div><div class="mcard-label">${esc(sub)}</div><div class="mcard-meta c-mu fs13">${lastLine}</div></div>`;
+    // 문제 은행 가능 여부: ALL_DATA에서 해당 과목 문항 수
+    const bankCnt = (ALL_DATA.length > DATA.length)
+      ? ALL_DATA.filter(q=>q.subject===sub).length : 0;
+    const bankBadge = bankCnt > 0
+      ? `<span class="bank-mini-badge">🏦 ${bankCnt}문항</span>` : '';
+    return `<div class="mcard" data-start="${esc(sub)}">
+      <span class="badge ${subBadge(sub)}">${esc(sub)}</span>
+      <div class="mcard-count">${qs.length}<sup> 문항</sup></div>
+      <div class="mcard-label">${esc(sub)}</div>
+      <div class="mcard-meta c-mu fs13">${lastLine}</div>
+      ${bankBadge ? `<div style="margin-top:4px">${bankBadge}</div>` : ''}
+    </div>`;
   }).join('');
 
   const allLast=lastFor('전과목');
@@ -738,6 +888,26 @@ function homeScreen(){
     <div class="sec-head sec-gap">시험 선택</div>
     ${setSelector}
     <div class="mode-grid">${allCard}${sCards}</div>
+    ${ALL_DATA.length > DATA.length ? `
+    <div class="divider" style="margin-top:20px"></div>
+    <div class="sec-head sec-gap" style="display:flex;align-items:center;gap:8px">
+      🏦 문제 은행
+      <span style="font-size:11px;color:var(--mu);font-weight:400;margin-left:2px">전 회차 랜덤 출제</span>
+    </div>
+    <div class="bank-grid">
+      ${[...new Set(ALL_DATA.map(q=>q.subject))].map(sub=>{
+        const allQs = ALL_DATA.filter(q=>q.subject===sub);
+        const years = [...new Set(allQs.map(q=>q.year))].sort((a,b)=>b-a);
+        return `<div class="bank-card" data-bank="${esc(sub)}">
+          <div class="bank-card-top">
+            <span class="badge ${subBadge(sub)}">${esc(sub)}</span>
+            <span class="bank-count">${allQs.length}</span>
+          </div>
+          <div class="bank-years">${years.map(y=>`<span class="bank-year-chip">${y}</span>`).join('')}</div>
+          <div class="bank-label">문제 수 직접 설정 · 랜덤 출제</div>
+        </div>`;
+      }).join('')}
+    </div>` : ''}
     <div class="divider"></div>
     <div class="flex ai-c gap8 mt8" style="margin-bottom:12px">
       <div class="sec-head" style="margin-bottom:0">최근 응시</div>
@@ -848,7 +1018,7 @@ function resultScreen(){
     <div class="res-hero">
       <div class="res-emoji">${pass?'🎉':'📚'}</div>
       <div class="res-verdict ${pass?'pass':'fail'}">${pass?'합격':'불합격'}</div>
-      <div class="res-sub">${esc(r.subject)} · ${DATA[0]?.year||2025}년 지방직 9급</div>
+      <div class="res-sub">${esc(r.subject)} · ${r.isBank ? '문제 은행' : (DATA[0]?.year||2025)+'년 지방직 9급'}</div>
     </div>
     <div class="stats">
       <div class="stat"><div class="stat-v" style="color:${pass?'var(--tl)':'var(--rs)'}">${r.totalScore}</div><div class="stat-l">총점</div></div>
@@ -1030,6 +1200,184 @@ function settingsScreen(){
 }
 
 /* ══════════════════════════════════════════════════════════════
+   BANK MODAL
+══════════════════════════════════════════════════════════════ */
+let _bankSubject = null;
+let _bankYears   = new Set();
+
+function openBankModal(subject) {
+  _bankSubject = subject;
+
+  // 과목별 가능 연도 목록
+  const pool = ALL_DATA.filter(q => q.subject === subject);
+  const years = [...new Set(pool.map(q => q.year))].sort((a, b) => b - a);
+  _bankYears = new Set(years); // 기본: 전체 선택
+
+  // 모달 제목
+  document.getElementById('bm-sub-label').textContent = `${subject} · 전 회차 랜덤 출제`;
+
+  // 과목 버튼 (현재 과목 단일 선택 고정 표시 — 필요 시 멀티 확장 가능)
+  const allSubjects = [...new Set(ALL_DATA.map(q => q.subject))];
+  document.getElementById('bm-subjects').innerHTML = allSubjects.map(s =>
+    `<button class="bm-subj-btn${s === subject ? ' on' : ''}" onclick="selectBankSubject('${s}')">${s}</button>`
+  ).join('');
+
+  // 연도 버튼
+  renderBankYears(years);
+
+  // 슬라이더 초기화
+  updateBankSlider();
+
+  document.getElementById('bank-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeBankModal() {
+  document.getElementById('bank-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function selectBankSubject(sub) {
+  _bankSubject = sub;
+  document.querySelectorAll('.bm-subj-btn').forEach(b => {
+    b.classList.toggle('on', b.textContent === sub);
+  });
+  // 해당 과목 연도 재구성
+  const pool = ALL_DATA.filter(q => q.subject === sub);
+  const years = [...new Set(pool.map(q => q.year))].sort((a, b) => b - a);
+  _bankYears = new Set(years);
+  renderBankYears(years);
+  document.getElementById('bm-sub-label').textContent = `${sub} · 전 회차 랜덤 출제`;
+  updateBankSlider();
+}
+
+function renderBankYears(years) {
+  document.getElementById('bm-years').innerHTML = years.map(y =>
+    `<button class="bm-year-btn${_bankYears.has(y) ? ' on' : ''}" onclick="toggleBankYear(${y})">${y}년</button>`
+  ).join('');
+}
+
+function toggleBankYear(year) {
+  if (_bankYears.has(year)) {
+    if (_bankYears.size <= 1) return; // 최소 1개 유지
+    _bankYears.delete(year);
+  } else {
+    _bankYears.add(year);
+  }
+  document.querySelectorAll('.bm-year-btn').forEach(b => {
+    const y = parseInt(b.textContent);
+    b.classList.toggle('on', _bankYears.has(y));
+  });
+  updateBankSlider();
+}
+
+function getBankPool() {
+  return ALL_DATA.filter(q =>
+    q.subject === _bankSubject && _bankYears.has(q.year)
+  );
+}
+
+function updateBankSlider() {
+  const pool = getBankPool();
+  const max  = pool.length;
+  const slider = document.getElementById('bm-slider');
+  const prev   = parseInt(slider.value);
+
+  slider.min = 1;
+  slider.max = max;
+  slider.value = Math.min(prev || 10, max);
+
+  document.getElementById('bm-cnt-max').textContent = max;
+  document.getElementById('bm-slider-max-lbl').textContent = max;
+  document.getElementById('bm-cnt-val').textContent = slider.value;
+
+  const startBtn = document.getElementById('bm-start');
+  startBtn.disabled = max === 0;
+
+  // 정보 텍스트
+  const selectedYears = [..._bankYears].sort((a,b) => b-a).join('·');
+  document.getElementById('bm-info-txt').textContent =
+    max > 0
+      ? `${selectedYears}년 ${_bankSubject} 총 ${max}문항 중 ${slider.value}문항을 랜덤 출제해요`
+      : '선택한 조건에 해당하는 문항이 없어요';
+}
+
+function setBmCount(n) {
+  const slider = document.getElementById('bm-slider');
+  slider.value = Math.min(n, parseInt(slider.max));
+  document.getElementById('bm-cnt-val').textContent = slider.value;
+  updateBankInfo();
+}
+
+function setBmQuickMax() {
+  const slider = document.getElementById('bm-slider');
+  slider.value = slider.max;
+  document.getElementById('bm-cnt-val').textContent = slider.value;
+  updateBankInfo();
+}
+
+function updateBankInfo() {
+  const slider = document.getElementById('bm-slider');
+  document.getElementById('bm-cnt-val').textContent = slider.value;
+  const selectedYears = [..._bankYears].sort((a,b) => b-a).join('·');
+  const max = parseInt(slider.max);
+  document.getElementById('bm-info-txt').textContent =
+    max > 0
+      ? `${selectedYears}년 ${_bankSubject} 총 ${max}문항 중 ${slider.value}문항을 랜덤 출제해요`
+      : '선택한 조건에 해당하는 문항이 없어요';
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startBankExam() {
+  const pool    = getBankPool();
+  const cnt     = Math.min(parseInt(document.getElementById('bm-slider').value), pool.length);
+  const shuffleOpts = document.getElementById('bm-shuffle-opts').checked;
+
+  let picked = shuffle(pool).slice(0, cnt);
+
+  // 보기 순서 섞기 옵션
+  if (shuffleOpts) {
+    picked = picked.map(q => {
+      const idxShuf = shuffle([0,1,2,3]);
+      const newOpts = idxShuf.map(i => q.options[i]);
+      const origAns = q.options[q.correct_answer - 1]; // 정답 텍스트
+      const newAns  = newOpts.findIndex(o => o === origAns) + 1;
+      // ①②③④ 기호 재부착
+      const syms = ['①','②','③','④'];
+      const reLabeled = newOpts.map((o, i) => {
+        const text = o.replace(/^[①②③④]\s*/, '');
+        return syms[i] + text;
+      });
+      return { ...q, options: reLabeled, correct_answer: newAns };
+    });
+  }
+
+  const label = `문제 은행 — ${_bankSubject} (${[..._bankYears].sort((a,b)=>b-a).join('·')}년)`;
+  exam = {
+    subject: label,
+    questions: picked,
+    curIdx: 0, answers: {}, flags: new Set(), memos: {}, elapsed: 0, finished: false,
+    isBank: true,
+  };
+
+  closeBankModal();
+  goto('exam');
+}
+
+// 슬라이더 실시간 이벤트 (모달이 DOM에 붙은 후)
+document.addEventListener('input', e => {
+  if (e.target.id === 'bm-slider') updateBankInfo();
+});
+
+/* ══════════════════════════════════════════════════════════════
    REVIEW HELPERS
 ══════════════════════════════════════════════════════════════ */
 function toggleRvCard(id){
@@ -1088,7 +1436,7 @@ function finishExam(){
     if(!ok) wrongItems.push(item);
     if(flags.has(i)&&ok) flagItems.push(item);
   });
-  result={subject,elapsed,totalScore,correct:totalC,total:questions.length,passed,subjScores:ss,wrongItems,flagItems,settings,memos,questions};
+  result={subject,elapsed,totalScore,correct:totalC,total:questions.length,passed,subjScores:ss,wrongItems,flagItems,settings,memos,questions,isBank:exam.isBank||false};
   const sess={
     id:String(Date.now()),date:todayStr(),subject,
     score:totalScore,passed,elapsed,total:questions.length,
@@ -1135,7 +1483,10 @@ function bindAll(){
   // exam-set 변경
   const sel=$('set-select');
   if(sel) sel.addEventListener('change',async e=>{
-    const set=(lg(SK.sets)||[]).find(s=>s.id===e.target.value);
+    const selectedId = e.target.value;
+    const sets = examSets.length ? examSets : (lg(SK.sets)||[]);
+    // id가 숫자일 수 있으므로 == 로 비교
+    const set = sets.find(s => String(s.id) === String(selectedId));
     if(set){ await loadExamJson(set); render() }
   });
 }
@@ -1146,6 +1497,7 @@ function onClick(e){
 
   if(el.dataset.screen){ goto(el.dataset.screen); return }
   if(el.dataset.start){ startExam(el.dataset.start); return }
+  if(el.dataset.bank){ openBankModal(el.dataset.bank); return }
   if(el.dataset.rid){
     const s=getSess().find(s=>s.id===el.dataset.rid);
     if(s){ reviewSrc=s; goto('review') } return;
@@ -1218,6 +1570,7 @@ function onClick(e){
 ══════════════════════════════════════════════════════════════ */
 async function boot(){
   DATA = lg(SK.data)||[...FALLBACK];
+  ALL_DATA = lg(SK.allData)||[...FALLBACK];
   const cached=lg(SK.sets); if(cached) examSets=cached;
 
   initSB();
