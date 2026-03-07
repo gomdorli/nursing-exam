@@ -648,12 +648,10 @@ async function loadRemote(){
       // 전 회차 JSON 병렬 로드 → ALL_DATA 구성
       // allSettled: 일부 실패해도 성공한 것만 모아서 사용
       const allResults = await Promise.allSettled(sets.map(s => fetchExamJson(s)));
-      allResults.forEach((r, i) => {
-        if(r.status === 'rejected') console.warn('JSON load failed:', sets[i]?.storage_path, r.reason);
+      allResults.forEach((r,i)=>{
+        if(r.status==='rejected') console.warn('JSON load failed:',sets[i]?.storage_path, r.reason);
       });
-      ALL_DATA = allResults
-        .filter(r => r.status === 'fulfilled')
-        .flatMap(r => r.value);
+      ALL_DATA = allResults.filter(r=>r.status==='fulfilled').flatMap(r=>r.value);
       if(ALL_DATA.length) ls(SK.allData, ALL_DATA);
     }
 
@@ -669,12 +667,17 @@ async function loadRemote(){
 
 async function loadExamJson(set){
   if(!sb||!set) return;
+  activeSetId=set.id; // fetch 성패 무관하게 선택 회차 먼저 반영
   try{
     const d = await fetchExamJson(set);
-    DATA=d; ls(SK.data,d); activeSetId=set.id;
+    DATA=d; ls(SK.data,d);
   }catch(e){
-    console.warn('JSON fetch fail, fallback',e);
-    DATA=lg(SK.data)||[...FALLBACK];
+    console.warn('JSON fetch fail',e);
+    // 캐시가 같은 회차인 경우에만 사용, 아니면 빈 배열
+    const cached = lg(SK.data)||[];
+    const cachedYear = cached[0]?.year;
+    DATA = (cachedYear && cachedYear === set.year) ? cached : [];
+    toast(`${set.year}년 문제를 불러오지 못했어요. 네트워크를 확인해주세요.`);
   }
 }
 
@@ -1458,7 +1461,7 @@ function finishExam(){
    EVENTS
 ══════════════════════════════════════════════════════════════ */
 function bindAll(){
-  // onclick/onchange 방식 사용 → render() 재호출 시 중복 등록 방지
+  // on* 방식 사용 → render() 재호출 시 리스너 중복 등록 방지
   $('root').onclick = onClick;
 
   // 메모 입력 → debounce 저장
@@ -1487,7 +1490,7 @@ function bindAll(){
     };
   });
 
-  // exam-set 변경 (onchange → render() 재호출 시 리스너 중복 등록 방지)
+  // exam-set 변경
   const sel=$('set-select');
   if(sel) sel.onchange = async e=>{
     const selectedId = e.target.value;
