@@ -1452,35 +1452,36 @@ function finishExam(){
    EVENTS
 ══════════════════════════════════════════════════════════════ */
 function bindAll(){
-  $('root').addEventListener('click', onClick);
+  // onclick/onchange 방식 사용 → render() 재호출 시 중복 등록 방지
+  $('root').onclick = onClick;
 
   // 메모 입력 → debounce 저장
   const mta=$('memo-ta');
-  if(mta) mta.addEventListener('input',e=>{
+  if(mta) mta.oninput = e=>{
     const content=e.target.value;
     if(exam){
       exam.memos[exam.curIdx]=content;
       saveMemoDebounced(exam.questions[exam.curIdx], content);
     }
-  });
+  };
 
   // 엔터키
   const aPw=$('a-pw');
-  if(aPw) aPw.addEventListener('keydown',e=>{ if(e.key==='Enter') $('a-submit')?.click() });
+  if(aPw) aPw.onkeydown = e=>{ if(e.key==='Enter') $('a-submit')?.click() };
   const aEmail=$('a-email');
-  if(aEmail) aEmail.addEventListener('keydown',e=>{ if(e.key==='Enter') $('a-pw')?.focus() });
+  if(aEmail) aEmail.onkeydown = e=>{ if(e.key==='Enter') $('a-pw')?.focus() };
 
   // auth 탭 전환
   document.querySelectorAll('[data-atab]').forEach(btn=>{
-    btn.addEventListener('click',()=>{
+    btn.onclick = ()=>{
       const t=btn.dataset.atab;
       document.querySelectorAll('[data-atab]').forEach(b=>b.classList.toggle('on',b.dataset.atab===t));
       const sub=$('a-submit');
       if(sub){ sub.textContent=t==='login'?'로그인':'회원가입'; sub.dataset.mode=t }
-    });
+    };
   });
 
-  // exam-set 변경 (onchange로 교체 → render() 재호출 시 리스너 중복 등록 방지)
+  // exam-set 변경 (onchange → render() 재호출 시 리스너 중복 등록 방지)
   const sel=$('set-select');
   if(sel) sel.onchange = async e=>{
     const selectedId = e.target.value;
