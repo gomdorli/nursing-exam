@@ -646,9 +646,15 @@ async function loadRemote(){
       // 현재 선택 회차 로드
       await loadExamJson(sets[0]);
       // 전 회차 JSON 병렬 로드 → ALL_DATA 구성
-      const allArrays = await Promise.all(sets.map(s => fetchExamJson(s)));
-      ALL_DATA = allArrays.flat();
-      ls(SK.allData, ALL_DATA);
+      // allSettled: 일부 실패해도 성공한 것만 모아서 사용
+      const allResults = await Promise.allSettled(sets.map(s => fetchExamJson(s)));
+      allResults.forEach((r, i) => {
+        if(r.status === 'rejected') console.warn('JSON load failed:', sets[i]?.storage_path, r.reason);
+      });
+      ALL_DATA = allResults
+        .filter(r => r.status === 'fulfilled')
+        .flatMap(r => r.value);
+      if(ALL_DATA.length) ls(SK.allData, ALL_DATA);
     }
 
     syncSt='ok'; updSync();
