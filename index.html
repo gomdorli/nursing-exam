@@ -673,7 +673,6 @@ async function loadExamJson(set){
     DATA=d; ls(SK.data,d);
   }catch(e){
     console.warn('JSON fetch fail',e);
-    // 캐시가 같은 회차인 경우에만 사용, 아니면 빈 배열
     const cached = lg(SK.data)||[];
     const cachedYear = cached[0]?.year;
     DATA = (cachedYear && cachedYear === set.year) ? cached : [];
@@ -1495,14 +1494,13 @@ function bindAll(){
   if(sel) sel.onchange = async e=>{
     const selectedId = e.target.value;
     const sets = examSets.length ? examSets : (lg(SK.sets)||[]);
-    // id가 숫자일 수 있으므로 String 비교
     const set = sets.find(s => String(s.id) === String(selectedId));
     if(set){ await loadExamJson(set); render() }
   };
 }
 
 function onClick(e){
-  const el=e.target.closest('[data-screen],[data-start],[data-pick],[data-jump],[data-rid],[id]');
+  const el=e.target.closest('[data-screen],[data-start],[data-bank],[data-pick],[data-jump],[data-rid],[id]');
   if(!el) return;
 
   if(el.dataset.screen){ goto(el.dataset.screen); return }
